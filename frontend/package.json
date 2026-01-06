@@ -1,0 +1,59 @@
+{
+  "name": "jb-pinturas-frontend",
+  "version": "1.0.0",
+  "description": "Frontend para sistema de gestão de pintura JB Pinturas",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.13.0",
+    "@mui/material": "^5.13.0",
+    "@mui/icons-material": "^5.13.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "axios": "^1.4.0",
+    "redux": "^4.2.1",
+    "react-redux": "^8.1.1",
+    "@reduxjs/toolkit": "^1.9.5",
+    "typescript": "^5.1.0"
+  },
+  "devDependencies": {
+    "react-scripts": "5.0.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/node": "^18.15.0",
+    "prettier": "^2.8.8",
+    "eslint": "^8.40.0",
+    "eslint-config-react-app": "^7.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "cy:open": "cypress open --project ./frontend",
+    "cy:run": "cypress run --project ./frontend",
+    "eject": "react-scripts eject",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\""
+  },
+  "cypress": {
+    "baseUrl": "http://localhost:3000"
+  },
+  
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
