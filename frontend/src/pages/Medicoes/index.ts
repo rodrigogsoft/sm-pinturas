@@ -1,0 +1,1 @@
+export { MedicoesPage } from './MedicoesPage';

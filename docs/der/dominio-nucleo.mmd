@@ -1,0 +1,52 @@
+erDiagram
+    TB_CLIENTES {
+        UUID id PK
+        VARCHAR razao_social
+        VARCHAR cnpj_nif
+    }
+    TB_OBRAS {
+        UUID id PK
+        UUID id_cliente FK
+        UUID id_usuario_criador FK
+        VARCHAR nome
+        VARCHAR status
+    }
+    TB_PAVIMENTOS {
+        UUID id PK
+        UUID id_obra FK
+        VARCHAR nome
+        INT ordem
+    }
+    TB_AMBIENTES {
+        UUID id PK
+        UUID id_pavimento FK
+        VARCHAR nome
+        DECIMAL area_m2
+    }
+    TB_SERVICOS_CATALOGO {
+        INT id PK
+        VARCHAR nome
+        VARCHAR unidade_medida
+    }
+    TB_TABELA_PRECOS {
+        UUID id PK
+        UUID id_obra FK
+        INT id_servico_catalogo FK
+        DECIMAL preco_custo
+        DECIMAL preco_venda
+    }
+    TB_ITENS_AMBIENTE {
+        UUID id PK
+        UUID id_ambiente FK
+        UUID id_tabela_preco FK
+        VARCHAR nome_elemento
+        DECIMAL area_planejada
+    }
+
+    TB_CLIENTES ||--o{ TB_OBRAS : contrata
+    TB_OBRAS ||--o{ TB_PAVIMENTOS : contem
+    TB_PAVIMENTOS ||--o{ TB_AMBIENTES : contem
+    TB_AMBIENTES ||--o{ TB_ITENS_AMBIENTE : contem
+    TB_OBRAS ||--o{ TB_TABELA_PRECOS : precifica
+    TB_SERVICOS_CATALOGO ||--o{ TB_TABELA_PRECOS : referencia
+    TB_TABELA_PRECOS ||--o{ TB_ITENS_AMBIENTE : aplica

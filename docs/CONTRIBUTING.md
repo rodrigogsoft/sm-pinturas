@@ -1,316 +1,302 @@
-# Guia de Contribuição - JB Pinturas
+# Guia de Contribuição
 
-## Como Contribuir
+## 🤝 Como Contribuir
 
-### 1. Setup Local
+Ficamos felizes que você queira contribuir com o projeto ERP JB Pinturas! Este guia ajudará você a começar.
 
-```bash
-# Clone o repositório
-git clone <seu-repo>
-cd jb_pinturas
+## 📋 Código de Conduta
 
-# Instale as dependências
-cd backend && npm install && cd ..
-cd frontend && npm install && cd ..
-cd mobile && npm install && cd ..
-```
+* Seja respeitoso com todos os colaboradores
+* Mantenha discussões técnicas e produtivas
+* Reporte comportamentos inadequados ao líder do projeto
 
-### 2. Crie uma Branch
+## 🔀 Fluxo de Trabalho (Git Flow)
 
-```bash
-# Sempre crie uma branch a partir de main ou develop
-git checkout -b feature/sua-feature
-# ou
-git checkout -b fix/seu-fix
-# ou
-git checkout -b docs/sua-documentacao
-```
+### Branches
 
-### 3. Nomenclatura de Branches
+* `main` - Produção (protegida)
+* `develop` - Desenvolvimento ativo
+* `feature/*` - Novas funcionalidades
+* `bugfix/*` - Correções de bugs
+* `hotfix/*` - Correções urgentes em produção
 
-- `feature/*` - Nova funcionalidade
-- `fix/*` - Correção de bug
-- `docs/*` - Documentação
-- `refactor/*` - Refatoração
-- `test/*` - Testes
-- `chore/*` - Manutenção
-
-### 4. Commits
+### Como Criar uma Feature
 
 ```bash
-# Commit com mensagens claras e descritivas
-git commit -m "feat: descrição da feature"
-git commit -m "fix: descrição do bug corrigido"
-git commit -m "docs: atualização da documentação"
-git commit -m "refactor: melhorias no código"
-git commit -m "test: adição de testes"
+# Atualizar develop
+git checkout develop
+git pull origin develop
+
+# Criar branch da feature
+git checkout -b feature/nome-da-feature
+
+# Fazer commits
+git add .
+git commit -m "feat: descrição da mudança"
+
+# Push e criar PR
+git push origin feature/nome-da-feature
 ```
 
-### 5. Mensagens de Commit
+## 📝 Padrões de Commit (Conventional Commits)
 
-Siga o padrão Conventional Commits:
+Usamos o padrão [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-<type>(<scope>): <subject>
-<body>
-<footer>
+<tipo>(<escopo>): <descrição>
+
+[corpo opcional]
+
+[rodapé opcional]
 ```
 
-**Types:**
-- `feat`: Nova funcionalidade
-- `fix`: Correção de bug
-- `docs`: Documentação
-- `style`: Formatação (não altera lógica)
-- `refactor`: Refatoração
-- `perf`: Melhoria de performance
-- `test`: Testes
-- `chore`: Dependências, build, etc
+### Tipos de Commit
 
-**Exemplo:**
-```
-feat(auth): implementar autenticação JWT
+* `feat`: Nova funcionalidade
+* `fix`: Correção de bug
+* `docs`: Documentação
+* `style`: Formatação (não afeta código)
+* `refactor`: Refatoração de código
+* `test`: Adição ou correção de testes
+* `chore`: Tarefas de manutenção
 
-- Adicionar estratégia JWT
-- Criar guards de autenticação
-- Implementar login e registro
+### Exemplos
 
-Closes #123
-```
-
-### 6. Pull Request
-
-1. Faça push da sua branch
 ```bash
-git push origin feature/sua-feature
+feat(auth): adicionar autenticação JWT
+fix(mobile): corrigir sincronização offline
+docs(readme): atualizar instruções de instalação
+refactor(api): simplificar controller de obras
+test(obras): adicionar testes unitários
+chore(deps): atualizar dependências
 ```
 
-2. Abra um PR no GitHub/GitLab
+## 🏗️ Estrutura de um PR (Pull Request)
 
-3. Descreva:
-   - O que foi alterado
-   - Por que foi alterado
-   - Como testar
-   - Screenshots (se applicable)
+### Template de PR
 
-4. Garanta que:
-   - ✅ Testes passando
-   - ✅ Sem conflitos
-   - ✅ Código formatado
-   - ✅ Documentação atualizada
+```markdown
+## Descrição
+Breve descrição do que foi feito.
 
-### 7. Code Review
+## Tipo de Mudança
+- [ ] Bug fix
+- [ ] Nova feature
+- [ ] Breaking change
+- [ ] Documentação
 
-- Responda aos comentários
-- Faça ajustes solicitados
-- Após aprovação, merge será feito
+## Como Testar
+1. Passo 1
+2. Passo 2
+3. Resultado esperado
 
-## Padrões de Código
+## Checklist
+- [ ] Código segue os padrões do projeto
+- [ ] Testes foram adicionados/atualizados
+- [ ] Documentação foi atualizada
+- [ ] Build está passando
+- [ ] Linters estão ok
+```
+
+## 💻 Padrões de Código
+
+### TypeScript/JavaScript
+
+* Usar TypeScript estrito
+* Preferir `const` sobre `let`
+* Usar arrow functions para callbacks
+* Evitar `any` - usar tipos específicos
+
+```typescript
+// ❌ Ruim
+function getData(id: any) {
+  return fetch('/api/' + id);
+}
+
+// ✅ Bom
+const getData = async (id: string): Promise<Data> => {
+  const response = await fetch(`/api/${id}`);
+  return response.json();
+};
+```
+
+### Nomenclatura
+
+* **Arquivos**: `kebab-case.ts`
+* **Classes**: `PascalCase`
+* **Funções/Variáveis**: `camelCase`
+* **Constantes**: `UPPER_SNAKE_CASE`
+* **Interfaces**: `IPascalCase` ou `PascalCase`
+
+```typescript
+// Bom exemplo
+const API_BASE_URL = 'https://api.example.com';
+
+class UserService {
+  private readonly repository: IUserRepository;
+
+  async findUserById(userId: string): Promise<User> {
+    // implementação
+  }
+}
+```
 
 ### Backend (NestJS)
 
-**Estrutura de arquivo:**
+* Um módulo por domínio
+* DTOs para validação
+* Guards para autenticação
+* Interceptors para logging
+* Usar Dependency Injection
+
 ```typescript
-// feature.controller.ts
-@Controller('features')
-export class FeatureController {
-  constructor(private featureService: FeatureService) {}
+// obra.controller.ts
+@Controller('obras')
+@UseGuards(JwtAuthGuard)
+export class ObraController {
+  constructor(private readonly obraService: ObraService) {}
 
-  @Get()
-  findAll() {
-    return this.featureService.findAll();
+  @Post()
+  @UseGuards(RolesGuard)
+  @Roles('ENCARREGADO', 'ADMIN')
+  async create(@Body() dto: CreateObraDto) {
+    return this.obraService.create(dto);
   }
-}
-
-// feature.service.ts
-@Injectable()
-export class FeatureService {
-  constructor(
-    @InjectRepository(Feature)
-    private repo: Repository<Feature>,
-  ) {}
-
-  findAll() {
-    return this.repo.find();
-  }
-}
-
-// feature.module.ts
-@Module({
-  imports: [TypeOrmModule.forFeature([Feature])],
-  controllers: [FeatureController],
-  providers: [FeatureService],
-})
-export class FeatureModule {}
-```
-
-**DTOs:**
-```typescript
-// create-feature.dto.ts
-import { IsString, IsNotEmpty } from 'class-validator';
-
-export class CreateFeatureDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
 }
 ```
 
 ### Frontend (React)
 
-**Estrutura de componente:**
-```typescript
-// FeatureComponent.tsx
-import React, { FC } from 'react';
-import { Box, Typography } from '@mui/material';
+* Componentes funcionais com Hooks
+* Separar lógica em custom hooks
+* Props tipadas com TypeScript
+* Usar Material UI para consistência
 
-interface Props {
-  title: string;
-  onAction?: () => void;
+```typescript
+// ObraCard.tsx
+interface ObraCardProps {
+  obra: Obra;
+  onEdit: (id: string) => void;
 }
 
-export const FeatureComponent: FC<Props> = ({ title, onAction }) => {
+export const ObraCard: React.FC<ObraCardProps> = ({ obra, onEdit }) => {
+  const [loading, setLoading] = useState(false);
+
   return (
-    <Box>
-      <Typography variant="h5">{title}</Typography>
-    </Box>
+    <Card>
+      <CardContent>
+        <Typography variant="h6">{obra.nome}</Typography>
+        <Button onClick={() => onEdit(obra.id)}>
+          Editar
+        </Button>
+      </CardContent>
+    </Card>
   );
-};
-```
-
-**Custom Hook:**
-```typescript
-// useFeature.ts
-import { useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from './store';
-
-export const useFeature = () => {
-  const dispatch = useAppDispatch();
-  const { data, loading } = useAppSelector(state => state.feature);
-
-  const loadData = useCallback(() => {
-    dispatch(fetchFeature());
-  }, [dispatch]);
-
-  return { data, loading, loadData };
 };
 ```
 
 ### Mobile (React Native)
 
-**Estrutura de tela:**
+* Seguir padrões do Frontend
+* Testar em iOS e Android
+* Usar WatermelonDB para dados locais
+* Implementar tratamento de offline
+
+## 🧪 Testes
+
+### Backend - Jest
+
 ```typescript
-// FeatureScreen.tsx
-import React from 'react';
-import { View, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-
-export const FeatureScreen = () => {
-  const navigation = useNavigation();
-
-  return (
-    <View>
-      <Text>Feature Screen</Text>
-    </View>
-  );
-};
-```
-
-## Testes
-
-### Backend
-
-```bash
-# Testes unitários
-npm run test
-
-# Testes e2e
-npm run test:e2e
-
-# Coverage
-npm run test:cov
-```
-
-**Exemplo de teste:**
-```typescript
-describe('AuthService', () => {
-  let service: AuthService;
-  let repo: Repository<User>;
+describe('ObraService', () => {
+  let service: ObraService;
+  let repository: Repository<Obra>;
 
   beforeEach(async () => {
-    // Setup
+    const module = await Test.createTestingModule({
+      providers: [ObraService, mockRepository],
+    }).compile();
+
+    service = module.get<ObraService>(ObraService);
   });
 
-  it('should login with valid credentials', async () => {
-    const result = await service.login({
-      email: 'test@test.com',
-      password: 'password123',
-    });
-
-    expect(result).toHaveProperty('access_token');
+  it('deve criar uma obra', async () => {
+    const dto = { nome: 'Obra Teste' };
+    const result = await service.create(dto);
+    
+    expect(result).toBeDefined();
+    expect(result.nome).toBe(dto.nome);
   });
 });
 ```
 
-### Frontend
+### Frontend - React Testing Library
 
-```bash
-npm test
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react';
+
+describe('ObraCard', () => {
+  it('deve chamar onEdit ao clicar no botão', () => {
+    const mockEdit = jest.fn();
+    render(<ObraCard obra={mockObra} onEdit={mockEdit} />);
+    
+    fireEvent.click(screen.getByText('Editar'));
+    expect(mockEdit).toHaveBeenCalledWith(mockObra.id);
+  });
+});
 ```
 
-### Mobile
+## 📊 Cobertura de Testes
+
+* Mínimo: 80% de cobertura
+* Crítico (Financeiro): 95% de cobertura
 
 ```bash
-npm test
+# Backend
+npm run test:cov
+
+# Frontend
+npm run test -- --coverage
 ```
 
-## Documentação
+## 🔍 Code Review
 
-- Documente novas funcionalidades em `/docs`
-- Atualize README.md se necessário
-- Adicione comentários para lógica complexa
-- Mantenha JSDoc/TypeDoc atualizado
+### O que revisar
 
-## Linting e Formatting
+* [ ] Código está limpo e legível
+* [ ] Lógica está correta
+* [ ] Testes cobrem os casos
+* [ ] Sem código comentado/debug
+* [ ] Sem secrets/credentials
+* [ ] Performance é adequada
+* [ ] Segurança foi considerada
 
-```bash
-# Formatação automática
-npm run format
+### Checklist do Reviewer
 
-# Linting
-npm run lint
+* Ser construtivo nos comentários
+* Aprovar quando estiver ok
+* Solicitar mudanças se necessário
+* Testar localmente se possível
 
-# Fix automático
-npm run lint -- --fix
-```
+## 🚀 Deploy
 
-## Performance
+* Merges para `main` fazem deploy automático
+* CI/CD valida testes e build
+* Rollback disponível em caso de problemas
 
-- Evite renders desnecessários no React
-- Use useMemo e useCallback apropriadamente
-- Implemente paginação em listas grandes
-- Cache dados quando possível
-- Use indexes no banco de dados
+## 📚 Recursos
 
-## Segurança
+* [NestJS Docs](https://docs.nestjs.com/)
+* [React Docs](https://react.dev/)
+* [Material UI](https://mui.com/)
+* [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 
-- Nunca commite `.env` com dados sensíveis
-- Valide inputs no backend
-- Use HTTPS em produção
-- Sanitize dados do usuário
-- Implemente rate limiting
-- Use autenticação forte (JWT, bcrypt)
+## 💬 Dúvidas?
 
-## Processo de Review
+Entre em contato:
+* Tech Lead: [email]
+* Slack: #jb-pinturas-dev
+* Issues: GitHub Issues
 
-1. **Automático**: CI/CD checks
-2. **Manual**: Code review por 2+ pessoas
-3. **Testes**: Verificar cobertura > 80%
-4. **Merge**: Após aprovação e checks passando
+---
 
-## Dúvidas?
-
-- Consulte a documentação em `/docs`
-- Abra uma issue para discussão
-- Entre em contato com a equipe
-
-Obrigado por contribuir! 🎉
+**Obrigado por contribuir! 🎉**

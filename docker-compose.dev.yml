@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: jb_pinturas_db_dev
+    restart: always
+    environment:
+      POSTGRES_DB: jb_pinturas_dev
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: devpass
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - jb_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: jb_pinturas_redis_dev
+    restart: always
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data_dev:/data
+    ports:
+      - "6380:6379"
+    networks:
+      - jb_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: jb_pinturas_api_dev
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: development
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: devuser
+      DATABASE_PASSWORD: devpass
+      DATABASE_NAME: jb_pinturas_dev
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PORT: 4000
+      LOG_LEVEL: debug
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - jb_network
+    command: npm run start:dev
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: jb_pinturas_web_dev
+    restart: always
+    ports:
+      - "3010:3010"
+    environment:
+      VITE_API_URL: http://localhost:4000/api
+      VITE_ENV: development
+      VITE_PROXY_TARGET: http://backend:4000
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - jb_network
+    command: sh -c "npm install; npm run dev"
+
+volumes:
+  postgres_data_dev:
+    driver: local
+  redis_data_dev:
+    driver: local
+
+networks:
+  jb_network:
+    driver: bridge

@@ -1,44 +1,57 @@
 {
   "name": "jb-pinturas-frontend",
   "version": "1.0.0",
-  "description": "Frontend para sistema de gestão de pintura JB Pinturas",
+  "description": "Painel Web React - ERP JB Pinturas",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.3",
+    "@mui/material": "^5.15.3",
+    "@mui/x-data-grid": "^6.18.7",
+    "@mui/x-date-pickers": "^6.18.7",
+    "@reduxjs/toolkit": "^2.0.1",
+    "axios": "^1.6.5",
+    "date-fns": "^3.0.6",
+    "dayjs": "^1.11.10",
+    "firebase": "^12.10.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.13.0",
-    "@mui/material": "^5.13.0",
-    "@mui/icons-material": "^5.13.0",
-    "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0",
-    "axios": "^1.4.0",
-    "redux": "^4.2.1",
-    "react-redux": "^8.1.1",
-    "@reduxjs/toolkit": "^1.9.5",
-    "typescript": "^5.1.0"
+    "react-redux": "^9.1.0",
+    "react-router-dom": "^6.21.1",
+    "recharts": "^2.10.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "react-scripts": "5.0.1",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@types/node": "^18.15.0",
-    "prettier": "^2.8.8",
-    "eslint": "^8.40.0",
-    "eslint-config-react-app": "^7.0.1"
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "@types/react-router-dom": "^5.3.3",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "eslint-plugin-react": "^7.33.2",
+    "jsdom": "^29.0.1",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vite-tsconfig-paths": "^4.3.1",
+    "vitest": "^4.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "cy:open": "cypress open --project ./frontend",
-    "cy:run": "cypress run --project ./frontend",
-    "eject": "react-scripts eject",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\""
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "test": "vitest"
   },
-  "cypress": {
-    "baseUrl": "http://localhost:3000"
-  },
-  
   "eslintConfig": {
     "extends": [
       "react-app"

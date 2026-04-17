@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JB Pinturas - Test Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 14px 28px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.22);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        button:hover:not(:disabled) {
+            background: #5568d3;
+        }
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+        .message.error {
+            background: #fee;
+            color: #c33;
+            display: block;
+            border: 1px solid #fcc;
+        }
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            display: block;
+            border: 1px solid #cfc;
+        }
+        .debug {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #333;
+        }
+        .debug-line {
+            margin-bottom: 5px;
+        }
+        .debug-line.info { color: #0066cc; }
+        .debug-line.success { color: #008000; }
+        .debug-line.error { color: #cc0000; }
+        .credentials {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        .credentials strong {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .loader {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+            margin-bottom: 2px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        button[disabled] .loader {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 JB Pinturas ERP</h1>
+        <div class="subtitle">Sistema de Gestão de Obras</div>
+
+        <div id="credentials" class="credentials">
+            <strong>📝 Credenciais de Teste:</strong>
+            Email: admin@jbpinturas.com.br<br>
+            Senha: Admin@2026
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="seu@email.com"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="sua senha"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span class="loader"></span>
+                <span id="btnText">Entrar</span>
+            </button>
+        </form>
+
+        <div id="debug" class="debug"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const messageDiv = document.getElementById('message');
+        const debugDiv = document.getElementById('debug');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const credentialsDiv = document.getElementById('credentials');
+
+        // Pre-fill form with test credentials
+        emailInput.value = 'admin@jbpinturas.com.br';
+        passwordInput.value = 'Admin@2026';
+
+        function debug(msg, type = 'info') {
+            const line = document.createElement('div');
+            line.className = `debug-line ${type}`;
+            const time = new Date().toLocaleTimeString('pt-BR');
+            line.textContent = `[${time}] ${msg}`;
+            debugDiv.appendChild(line);
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+        }
+
+        function showMessage(msg, isError = false) {
+            messageDiv.textContent = msg;
+            messageDiv.classList.remove('success', 'error');
+            messageDiv.classList.add(isError ? 'error' : 'success');
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            debugDiv.innerHTML = '';
+            debug('Iniciando processo de login...', 'info');
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            if (!email || !password) {
+                showMessage('Email e senha são obrigatórios', true);
+                debug('Email ou senha em branco', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            btnText.textContent = 'Entrando...';
+            credentialsDiv.style.display = 'none';
+
+            try {
+                debug(`Enviando credentials: ${email} / ***`, 'info');
+                debug('URL: POST /api/v1/auth/login (via frontend proxy)', 'info');
+
+                const response = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                debug(`Response Status: ${response.status}`, response.status === 200 ? 'success' : 'error');
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao fazer login');
+                }
+
+                debug('Validando resposta...', 'info');
+
+                if (!data.access_token) {
+                    throw new Error('Nenhum token recebido');
+                }
+
+                debug('✓ access_token recebido', 'success');
+                debug(`✓ User: ${data.user.email}`, 'success');
+                debug(`✓ Role: ${data.user.id_perfil === 1 ? 'Administrator' : 'User'}`, 'success');
+
+                // Simulate Redux store update
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                debug('✓ Dados armazenados em localStorage (Redux store)', 'success');
+
+                showMessage(`✓ Bem-vindo, ${data.user.nome_completo}!`);
+                debug('✓ Login bem-sucedido!', 'success');
+                debug('Redirecionando para dashboard em 2 segundos...', 'info');
+
+                setTimeout(() => {
+                    // In real app, React Router would navigate here
+                    // window.location.href = '/dashboard';
+                    
+                    // For now, simulate it
+                    debug('Você seria redirecionado para /dashboard', 'info');
+                    alert('Login bem-sucedido! Em um app real, você seria redirecionado para o dashboard.');
+                }, 2000);
+
+            } catch (error) {
+                debug(`✗ Erro: ${error.message}`, 'error');
+                showMessage(`Erro: ${error.message}`, true);
+                submitBtn.disabled = false;
+                btnText.textContent = 'Entrar';
+            }
+        }
+
+        form.addEventListener('submit', handleSubmit);
+
+        // Auto-login on page load (for testing)
+        debug('Página carregada. Credenciais preenchidas.', 'info');
+        debug('Você pode clicar em "Entrar" ou deixar auto-enviar em 3 segundos...', 'info');
+    </script>
+</body>
+</html>

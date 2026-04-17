@@ -1,0 +1,78 @@
+erDiagram
+    TB_USUARIOS {
+        UUID id PK
+        VARCHAR nome_completo
+    }
+    TB_COLABORADORES {
+        UUID id PK
+        VARCHAR nome_completo
+    }
+    TB_OBRAS {
+        UUID id PK
+        VARCHAR nome
+    }
+    TB_LOTES_PAGAMENTO {
+        UUID id PK
+        UUID id_criado_por FK
+        UUID id_aprovado_por FK
+        DECIMAL valor_total
+        VARCHAR status
+    }
+    TB_MEDICOES {
+        UUID id PK
+        UUID id_lote_pagamento FK
+        DECIMAL qtd_executada
+        DECIMAL valor_calculado
+    }
+    TB_MEDICOES_COLABORADOR {
+        UUID id PK
+        UUID id_lote_pagamento FK
+        UUID id_colaborador FK
+        DECIMAL qtd_executada
+    }
+    TB_APROPRIACOES_FINANCEIRAS {
+        UUID id PK
+        UUID id_medicao_colaborador FK
+        UUID id_colaborador FK
+        UUID id_obra FK
+        UUID id_aprovado_por FK
+        DECIMAL valor_calculado
+        VARCHAR status
+    }
+    TB_VALES_ADIANTAMENTO {
+        UUID id PK
+        UUID id_colaborador FK
+        UUID id_obra FK
+        UUID id_aprovado_por FK
+        DECIMAL valor_solicitado
+        VARCHAR status
+    }
+    TB_VALES_ADIANTAMENTO_PARCELAS {
+        UUID id PK
+        UUID id_vale_adiantamento FK
+        UUID id_lote_pagamento FK
+        DECIMAL valor_parcela
+        VARCHAR status
+    }
+    TB_TABELA_PRECOS {
+        UUID id PK
+        UUID id_obra FK
+        DECIMAL preco_custo
+        DECIMAL preco_venda
+    }
+
+    TB_LOTES_PAGAMENTO ||--o{ TB_MEDICOES : paga
+    TB_LOTES_PAGAMENTO ||--o{ TB_MEDICOES_COLABORADOR : paga
+
+    TB_MEDICOES_COLABORADOR ||--o{ TB_APROPRIACOES_FINANCEIRAS : apropria
+    TB_COLABORADORES ||--o{ TB_APROPRIACOES_FINANCEIRAS : pertence
+    TB_OBRAS ||--o{ TB_APROPRIACOES_FINANCEIRAS : pertence
+    TB_USUARIOS ||--o{ TB_APROPRIACOES_FINANCEIRAS : aprova
+
+    TB_COLABORADORES ||--o{ TB_VALES_ADIANTAMENTO : solicita
+    TB_OBRAS ||--o{ TB_VALES_ADIANTAMENTO : vincula
+    TB_USUARIOS ||--o{ TB_VALES_ADIANTAMENTO : aprova
+    TB_VALES_ADIANTAMENTO ||--o{ TB_VALES_ADIANTAMENTO_PARCELAS : parcela
+    TB_LOTES_PAGAMENTO ||--o{ TB_VALES_ADIANTAMENTO_PARCELAS : desconta
+
+    TB_OBRAS ||--o{ TB_TABELA_PRECOS : precifica

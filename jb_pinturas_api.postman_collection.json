@@ -1,0 +1,1084 @@
+{
+  "info": {
+    "_postman_id": "jb_pinturas_api_v1",
+    "name": "JB Pinturas API v1",
+    "description": "Complete API collection for JB Pinturas construction management system. Includes authentication, CRUD operations for all entities, and reporting endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "description": "Login, logout, and session management",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  pm.environment.set('token', data.token);",
+                  "  pm.environment.set('usuario_id', data.usuario.id_usuario);",
+                  "  console.log('✅ Login success. Token saved to environment');",
+                  "} else {",
+                  "  console.log('❌ Login failed:', pm.response.json());",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@jbpinturas.com\",\n  \"senha\": \"senha123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👥 Usuários",
+      "description": "User management endpoints (admin only)",
+      "item": [
+        {
+          "name": "List Usuários",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios?skip=0&take=10&papel=admin",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "10"
+                },
+                {
+                  "key": "papel",
+                  "value": "admin",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Usuário Detalhe",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios/{{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "{{usuario_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Usuário",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao@jbpinturas.com\",\n  \"senha\": \"senha123\",\n  \"papel\": \"gerente\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Usuário",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João Silva Updated\",\n  \"papel\": \"encarregado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios/{{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "{{usuario_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Usuário",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios/{{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "{{usuario_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🏢 Obras",
+      "description": "Construction project management",
+      "item": [
+        {
+          "name": "List Obras",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/obras?skip=0&take=10&status=em_progresso",
+              "host": ["{{base_url}}"],
+              "path": ["obras"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "em_progresso",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Obra Detalhe",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/obras/obra-uuid-here",
+              "host": ["{{base_url}}"],
+              "path": ["obras", "obra-uuid-here"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Obra",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Reforma Residencial - Apto 401\",\n  \"endereco\": \"Rua A, 100 - São Paulo, SP\",\n  \"id_cliente\": \"cliente-uuid-here\",\n  \"data_inicio\": \"2026-02-10\",\n  \"data_previsao_termino\": \"2026-03-10\",\n  \"valor_contrato\": 15000.00,\n  \"area_total\": 120.50,\n  \"descricao\": \"Pintura completa, reboco e acabamentos\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/obras",
+              "host": ["{{base_url}}"],
+              "path": ["obras"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Obra",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"em_progresso\",\n  \"data_previsao_termino\": \"2026-03-15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/obras/obra-uuid-here",
+              "host": ["{{base_url}}"],
+              "path": ["obras", "obra-uuid-here"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Obra",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/obras/obra-uuid-here",
+              "host": ["{{base_url}}"],
+              "path": ["obras", "obra-uuid-here"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👨‍💼 Clientes",
+      "description": "Client management",
+      "item": [
+        {
+          "name": "List Clientes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes?skip=0&take=10",
+              "host": ["{{base_url}}"],
+              "path": ["clientes"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Cliente",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Maria Santos\",\n  \"email\": \"maria@email.com\",\n  \"telefone\": \"(11) 98765-4321\",\n  \"endereco\": \"Avenida Paulista, 1000 - São Paulo, SP\",\n  \"dia_mes_pagamento\": 15\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clientes",
+              "host": ["{{base_url}}"],
+              "path": ["clientes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cliente",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefone\": \"(11) 99999-9999\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clientes/cliente-uuid-here",
+              "host": ["{{base_url}}"],
+              "path": ["clientes", "cliente-uuid-here"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Cliente",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/clientes/cliente-uuid-here",
+              "host": ["{{base_url}}"],
+              "path": ["clientes", "cliente-uuid-here"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👷 Colaboradores",
+      "description": "Employee management",
+      "item": [
+        {
+          "name": "List Colaboradores",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/colaboradores?skip=0&take=10&ativo=true",
+              "host": ["{{base_url}}"],
+              "path": ["colaboradores"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "10"
+                },
+                {
+                  "key": "ativo",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Colaborador",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Pedro Oliveira\",\n  \"funcao\": \"pintor\",\n  \"telefone\": \"(11) 91234-5678\",\n  \"ativo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/colaboradores",
+              "host": ["{{base_url}}"],
+              "path": ["colaboradores"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Colaborador",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"funcao\": \"encarregado\",\n  \"ativo\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/colaboradores/colaborador-uuid-here",
+              "host": ["{{base_url}}"],
+              "path": ["colaboradores", "colaborador-uuid-here"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Colaborador",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/colaboradores/colaborador-uuid-here",
+              "host": ["{{base_url}}"],
+              "path": ["colaboradores", "colaborador-uuid-here"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔧 Serviços",
+      "description": "Service types and pricing",
+      "item": [
+        {
+          "name": "List Serviços",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/servicos?skip=0&take=10",
+              "host": ["{{base_url}}"],
+              "path": ["servicos"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Serviço",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Pintura Acrílica\",\n  \"descricao\": \"Pintura com tinta acrílica de boa qualidade\",\n  \"unidade\": \"m2\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/servicos",
+              "host": ["{{base_url}}"],
+              "path": ["servicos"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "💰 Preços",
+      "description": "Service pricing",
+      "item": [
+        {
+          "name": "List Preços por Serviço",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/precos?id_servico=servico-uuid-here",
+              "host": ["{{base_url}}"],
+              "path": ["precos"],
+              "query": [
+                {
+                  "key": "id_servico",
+                  "value": "servico-uuid-here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Preço",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_servico\": \"servico-uuid-here\",\n  \"preco_unitario\": 45.50,\n  \"data_vigencia\": \"2026-02-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/precos",
+              "host": ["{{base_url}}"],
+              "path": ["precos"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📋 Medições (RDO)",
+      "description": "Daily work reports (Relatório de Obra)",
+      "item": [
+        {
+          "name": "List Medições",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/medicoes?skip=0&take=20&id_obra=obra-uuid&data_inicio=2026-02-01&data_fim=2026-02-07",
+              "host": ["{{base_url}}"],
+              "path": ["medicoes"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "take",
+                  "value": "20"
+                },
+                {
+                  "key": "id_obra",
+                  "value": "obra-uuid",
+                  "disabled": true
+                },
+                {
+                  "key": "data_inicio",
+                  "value": "2026-02-01",
+                  "disabled": true
+                },
+                {
+                  "key": "data_fim",
+                  "value": "2026-02-07",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Medição",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_obra\": \"obra-uuid-here\",\n  \"id_colaborador\": \"colaborador-uuid-here\",\n  \"data\": \"2026-02-07\",\n  \"hora_inicio\": \"08:00\",\n  \"hora_termino\": \"17:00\",\n  \"area_pintada\": 45.50,\n  \"materiais_utilizados\": [\"tinta\", \"pincel\", \"fita\"],\n  \"observacoes\": \"Pintura concluída conforme especificação\",\n  \"encarregado\": \"João Silva\",\n  \"assinatura_base64\": \"data:image/png;base64,...\",\n  \"latitude\": -23.550520,\n  \"longitude\": -46.633309,\n  \"endereco_atual\": \"Rua A, 100 - São Paulo, SP\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/medicoes",
+              "host": ["{{base_url}}"],
+              "path": ["medicoes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Batch Sync (Mobile)",
+          "description": "Sincronizar múltiplas medições offline",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"id_obra\": \"obra-uuid-1\",\n    \"id_colaborador\": \"colab-uuid-1\",\n    \"data\": \"2026-02-06\",\n    \"area_pintada\": 30.00,\n    \"horas_trabalhadas\": 8,\n    \"observacoes\": \"RDO 1\"\n  },\n  {\n    \"id_obra\": \"obra-uuid-2\",\n    \"id_colaborador\": \"colab-uuid-2\",\n    \"data\": \"2026-02-07\",\n    \"area_pintada\": 45.50,\n    \"horas_trabalhadas\": 8,\n    \"observacoes\": \"RDO 2\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/medicoes/batch",
+              "host": ["{{base_url}}"],
+              "path": ["medicoes", "batch"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📊 Relatórios",
+      "description": "Business intelligence and analytics",
+      "item": [
+        {
+          "name": "Dashboard Financeiro",
+          "description": "KPIs: receita, custos, margem, obras ativas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/relatorios/dashboard-financeiro?periodo=mes",
+              "host": ["{{base_url}}"],
+              "path": ["relatorios", "dashboard-financeiro"],
+              "query": [
+                {
+                  "key": "periodo",
+                  "value": "mes"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Medições com Filtros",
+          "description": "Relatório de medições por período, obra, status pagamento",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/relatorios/medicoes?data_inicio=2026-02-01&data_fim=2026-02-07&id_obra=obra-uuid&status_pagamento=pendente",
+              "host": ["{{base_url}}"],
+              "path": ["relatorios", "medicoes"],
+              "query": [
+                {
+                  "key": "data_inicio",
+                  "value": "2026-02-01"
+                },
+                {
+                  "key": "data_fim",
+                  "value": "2026-02-07"
+                },
+                {
+                  "key": "id_obra",
+                  "value": "obra-uuid",
+                  "disabled": true
+                },
+                {
+                  "key": "status_pagamento",
+                  "value": "pendente",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Produtividade por Período",
+          "description": "Análise de produtividade: horas, área pintada, custo unitário",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/relatorios/produtividade?periodo=mes",
+              "host": ["{{base_url}}"],
+              "path": ["relatorios", "produtividade"],
+              "query": [
+                {
+                  "key": "periodo",
+                  "value": "mes"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Margem de Lucro",
+          "description": "Análise: receita, custo, margem e % por obra",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/relatorios/margem-lucro?data_inicio=2026-01-01&data_fim=2026-02-07",
+              "host": ["{{base_url}}"],
+              "path": ["relatorios", "margem-lucro"],
+              "query": [
+                {
+                  "key": "data_inicio",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "data_fim",
+                  "value": "2026-02-07"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "usuario_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

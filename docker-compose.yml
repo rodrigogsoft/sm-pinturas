@@ -1,142 +1,140 @@
-version: '3.8'
-
 services:
-  # PostgreSQL Database
+  # Banco de Dados PostgreSQL
   postgres:
     image: postgres:15-alpine
     container_name: jb_pinturas_db
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${DATABASE_USER:-postgres}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
-      POSTGRES_DB: ${DATABASE_NAME:-jb_pinturas}
-      TZ: America/Sao_Paulo
+      POSTGRES_DB: jb_pinturas_db
+      POSTGRES_USER: jb_admin
+      POSTGRES_PASSWORD: jb_secure_pass_2026
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     ports:
-      - "${DATABASE_PORT:-5433}:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/src/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - jb_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U jb_admin -d jb_pinturas_db"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Redis Cache (optional)
+  # Redis para Cache e Jobs
   redis:
     image: redis:7-alpine
-    container_name: jb_pinturas_cache
+    container_name: jb_pinturas_redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
+    command: redis-server --appendonly yes --requirepass redis_jb_2026
     volumes:
       - redis_data:/data
     networks:
       - jb_network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Backend API
-  api:
+  # Backend API (NestJS)
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: development
     container_name: jb_pinturas_api
+    restart: unless-stopped
+    ports:
+      - "3005:3000"
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      API_PORT: ${API_PORT:-3001}
-      API_URL: ${API_URL:-http://localhost:3001}
+      NODE_ENV: development
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
-      DATABASE_USER: ${DATABASE_USER:-postgres}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
-      DATABASE_NAME: ${DATABASE_NAME:-jb_pinturas}
-      DATABASE_URL: postgresql://${DATABASE_USER:-postgres}:${DATABASE_PASSWORD:-postgres}@postgres:5432/${DATABASE_NAME:-jb_pinturas}
-      JWT_SECRET: ${JWT_SECRET:-your_secret_key_change_in_production}
-      JWT_EXPIRATION: ${JWT_EXPIRATION:-24h}
+      DATABASE_USER: jb_admin
+      DATABASE_PASSWORD: jb_secure_pass_2026
+      DATABASE_NAME: jb_pinturas_db
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
-    ports:
-      - "${API_PORT:-3001}:3001"
+      REDIS_PASSWORD: redis_jb_2026
+      JWT_SECRET: jwt_secret_key_change_in_production
+      JWT_EXPIRES_IN: 7d
+      PORT: 3000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
     networks:
       - jb_network
     command: npm run start:dev
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  # Frontend React
+  # Frontend Web (React)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: development
     container_name: jb_pinturas_web
-    environment:
-      REACT_APP_API_URL: http://localhost:3001
-      REACT_APP_ENV: ${NODE_ENV:-development}
+    restart: unless-stopped
     ports:
-      - "3000:3000"
-    depends_on:
-      - api
+      - "3010:3010"
+    environment:
+      VITE_ENV: development
+      VITE_PROXY_TARGET: http://backend:3000
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    depends_on:
+      - backend
     networks:
       - jb_network
-    command: npm start
+    command: sh -c "npm install; npm run dev -- --host 0.0.0.0"
 
-  # Adminer - Database Management UI
+  # Adminer - Interface Web para PostgreSQL
   adminer:
-    image: adminer
+    image: adminer:latest
     container_name: jb_pinturas_adminer
+    restart: unless-stopped
     ports:
       - "8080:8080"
-    depends_on:
-      - postgres
-    networks:
-      - jb_network
     environment:
       ADMINER_DEFAULT_SERVER: postgres
-
-  # pgAdmin - Advanced PostgreSQL Management
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: jb_pinturas_pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@jbpinturas.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'False'
-    ports:
-      - "5050:80"
+      ADMINER_DESIGN: nette
     depends_on:
       - postgres
     networks:
       - jb_network
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
+
+  # Redis Commander - Interface Web para Redis
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: jb_pinturas_redis_commander
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:redis_jb_2026
+    depends_on:
+      - redis
+    networks:
+      - jb_network
+
+networks:
+  jb_network:
+    driver: bridge
 
 volumes:
   postgres_data:
     driver: local
   redis_data:
     driver: local
-  pgadmin_data:
-    driver: local
-
-networks:
-  jb_network:
-    driver: bridge

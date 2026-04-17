@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find c:Userskbca_developjb_pinturas/mobile/src -type f -name *.tsx)",
+      "Bash(find /c/Users/kbca_/develop/jb_pinturas/mobile/src -type f -name *.tsx)",
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "Bash(grep -c @Entity /c/Users/kbca_/develop/jb_pinturas/backend/src/modules/**/*.entity.ts)",
+      "Bash(find /c/Users/kbca_/develop/jb_pinturas/backend/src/modules -name *.entity.ts -exec grep -l @Entity {})",
+      "Bash(find /c/Users/kbca_/develop/jb_pinturas/backend/src -name *finalizacao* -o -name *assinatura* -o -name *os*)"
+    ]
+  }
+}

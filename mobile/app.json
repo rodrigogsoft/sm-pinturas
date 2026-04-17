@@ -1,4 +1,23 @@
 {
-  "name": "jb-pinturas-mobile",
-  "displayName": "JB Pinturas"
+  "name": "jbpinturas",
+  "displayName": "SM Pinturas",
+  "expo": {
+    "name": "SM Pinturas",
+    "slug": "sm-pinturas",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
 }

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JB Pinturas - Teste de Login Detalhado</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; margin-bottom: 15px; font-size: 20px; }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: monospace;
+        }
+        textarea {
+            font-family: 'Courier New', monospace;
+            height: 200px;
+            resize: vertical;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button[disabled] {
+            background: #999;
+            cursor: not-allowed;
+        }
+        .output {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 12px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+        .log-line {
+            margin-bottom: 3px;
+        }
+        .log-line.info { color: #0066cc; }
+        .log-line.success { color: #008000; }
+        .log-line.error { color: #cc0000; font-weight: bold; }
+        .log-line.warning { color: #ff8800; }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .status.running { background: #fff3cd; color: #856404; }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel: Test Controls -->
+        <div class="panel">
+            <h1>🧪 Teste de Login</h1>
+            
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" value="admin@jbpinturas.com.br">
+            </div>
+            
+            <div class="form-group">
+                <label>Senha:</label>
+                <input type="password" id="password" value="Admin@2026">
+            </div>
+
+            <div>
+                <button onclick="testDirectBackend()">1. Testar API Direto (3000)</button>
+                <button onclick="testViaProxy()">2. Testar Via Proxy (3001)</button>
+                <button onclick="testBoth()">3. Testar Ambos</button>
+                <button onclick="clearLog()">Limpar Log</button>
+            </div>
+
+            <div id="status" class="status"></div>
+            <div id="output" class="output"></div>
+        </div>
+
+        <!-- Right Panel: Information -->
+        <div class="panel">
+            <h1>📋 Informações</h1>
+            <p><strong>Backend URL:</strong> http://localhost:3000/api/v1/auth/login</p>
+            <p><strong>Frontend Proxy:</strong> http://localhost:3001/api/v1/auth/login</p>
+            <p><strong>Docker Network:</strong> backend:3000</p>
+            
+            <h1 style="margin-top: 20px;">🔑 Credenciais</h1>
+            <p><strong>Email:</strong> admin@jbpinturas.com.br</p>
+            <p><strong>Senha:</strong> Admin@2026</p>
+
+            <h1 style="margin-top: 20px;">✅ Status dos Serviços</h1>
+            <div id="services"></div>
+
+            <h1 style="margin-top: 20px;">🚀 Próximos Passos</h1>
+            <ol style="margin-left: 20px; line-height: 1.8;">
+                <li>Execute teste 1 (API Direto)</li>
+                <li>Execute teste 2 (Via Proxy)</li>
+                <li>Se ambos passarem, o login está funcionando</li>
+                <li>Abra http://localhost:3001/login em seu navegador</li>
+                <li>Preencha o formulário e clique em "Entrar"</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const services = document.getElementById('services');
+
+        function log(msg, type = 'info') {
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            const time = new Date().toLocaleTimeString('pt-BR');
+            line.textContent = `[${time}] ${msg}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function setStatus(msg, type) {
+            status.textContent = msg;
+            status.className = `status ${type}`;
+        }
+
+        function clearLog() {
+            output.innerHTML = '';
+        }
+
+        async function makeRequest(baseURL, credentials) {
+            return new Promise((resolve) => {
+                const body = JSON.stringify(credentials);
+                const url = new URL(baseURL + '/auth/login');
+                
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: body
+                };
+
+                log(`Enviando para: ${baseURL}/auth/login`, 'info');
+                log(`Credentials: ${credentials.email} / ***`, 'info');
+
+                fetch(url, options)
+                    .then(r => {
+                        log(`Status: ${r.status}`, r.status === 200 ? 'success' : 'error');
+                        return r.json();
+                    })
+                    .then(data => {
+                        if (data.access_token) {
+                            log(`✅ Token recebido: ${data.access_token.substring(0, 40)}...`, 'success');
+                            log(`✅ User: ${data.user.email}`, 'success');
+                            log(`✅ Role: ${data.user.id_perfil === 1 ? 'Admin' : 'User'}`, 'success');
+                            resolve({ success: true, data });
+                        } else {
+                            log(`❌ Nenhum token na resposta`, 'error');
+                            log(`Response: ${JSON.stringify(data).substring(0, 100)}`, 'error');
+                            resolve({ success: false, error: 'No token' });
+                        }
+                    })
+                    .catch(e => {
+                        log(`❌ Erro: ${e.message}`, 'error');
+                        resolve({ success: false, error: e.message });
+                    });
+            });
+        }
+
+        async function testDirectBackend() {
+            clearLog();
+            setStatus('Testando API Direto...', 'running');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            log('=== Teste 1: API Direto (Backend na porta 3000) ===', 'info');
+            const result = await makeRequest('http://localhost:3000/api/v1', { email, password });
+            
+            if (result.success) {
+                setStatus('✅ API Direto Funcionando!', 'success');
+                log('✅ PASSAR para o próximo teste', 'success');
+            } else {
+                setStatus('❌ API Direto Falhou', 'error');
+            }
+        }
+
+        async function testViaProxy() {
+            clearLog();
+            setStatus('Testando Via Proxy...', 'running');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            log('=== Teste 2: Via Proxy (Frontend na porta 3001) ===', 'info');
+            const result = await makeRequest('http://localhost:3001/api/v1', { email, password });
+            
+            if (result.success) {
+                setStatus('✅ Proxy Funcionando!', 'success');
+                log('✅ Login via Proxy está OK', 'success');
+                log('⚠️ Se esse teste passou, o React form também funcionará', 'warning');
+            } else {
+                setStatus('❌ Proxy Falhou', 'error');
+            }
+        }
+
+        async function testBoth() {
+            clearLog();
+            setStatus('Testando Ambos...', 'running');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            log('=== Teste Combinado ===', 'info');
+            
+            const result1 = await makeRequest('http://localhost:3000/api/v1', { email, password });
+            log('', 'info');
+            const result2 = await makeRequest('http://localhost:3001/api/v1', { email, password });
+            
+            if (result1.success && result2.success) {
+                setStatus('✅ TUDO FUNCIONANDO! Login pronto para usar', 'success');
+                log('Você pode abrir http://localhost:3001/login no navegador', 'success');
+            } else {
+                setStatus('❌ Um dos testes falhou', 'error');
+            }
+        }
+
+        // Auto check services
+        async function checkServices() {
+            const checks = [
+                { name: 'Backend API', url: 'http://localhost:3000/api/v1/auth' },
+                { name: 'Frontend Proxy', url: 'http://localhost:3001/api/v1/auth' },
+                { name: 'Login Page', url: 'http://localhost:3001/login' }
+            ];
+
+            let html = '';
+            for (const check of checks) {
+                try {
+                    const r = await fetch(check.url, { method: 'HEAD' });
+                    html += `<p>✅ ${check.name}</p>`;
+                } catch {
+                    html += `<p>❌ ${check.name}</p>`;
+                }
+            }
+            services.innerHTML = html;
+        }
+
+        checkServices();
+    </script>
+</body>
+</html>

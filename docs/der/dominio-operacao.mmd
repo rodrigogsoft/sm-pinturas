@@ -1,0 +1,79 @@
+erDiagram
+    TB_USUARIOS {
+        UUID id PK
+        VARCHAR nome_completo
+    }
+    TB_COLABORADORES {
+        UUID id PK
+        VARCHAR nome_completo
+    }
+    TB_OBRAS {
+        UUID id PK
+        VARCHAR nome
+    }
+    TB_AMBIENTES {
+        UUID id PK
+        VARCHAR nome
+    }
+    TB_ITENS_AMBIENTE {
+        UUID id PK
+        VARCHAR nome_elemento
+    }
+    TB_SESSOES_DIARIAS {
+        UUID id PK
+        UUID id_encarregado FK
+        UUID id_obra FK
+        DATE data_sessao
+    }
+    TB_ALOCACOES_TAREFA {
+        UUID id PK
+        UUID id_sessao FK
+        UUID id_ambiente FK
+        UUID id_item_ambiente FK
+        UUID id_colaborador FK
+    }
+    TB_ALOCACOES_ITENS {
+        UUID id PK
+        UUID id_sessao FK
+        UUID id_ambiente FK
+        UUID id_item_ambiente FK
+        UUID id_colaborador FK
+        UUID id_alocacao_legado FK
+        UUID id_tabela_preco FK
+    }
+    TB_MEDICOES {
+        UUID id PK
+        UUID id_alocacao FK
+        UUID id_obra FK
+        DECIMAL qtd_executada
+    }
+    TB_MEDICOES_COLABORADOR {
+        UUID id PK
+        UUID id_alocacao_item FK
+        UUID id_colaborador FK
+        UUID id_item_ambiente FK
+        UUID id_medicao_legado FK
+        DECIMAL qtd_executada
+    }
+
+    TB_USUARIOS ||--o{ TB_SESSOES_DIARIAS : encarrega
+    TB_OBRAS ||--o{ TB_SESSOES_DIARIAS : executa
+
+    TB_SESSOES_DIARIAS ||--o{ TB_ALOCACOES_TAREFA : gera
+    TB_AMBIENTES ||--o{ TB_ALOCACOES_TAREFA : recebe
+    TB_ITENS_AMBIENTE ||--o{ TB_ALOCACOES_TAREFA : detalha
+    TB_COLABORADORES ||--o{ TB_ALOCACOES_TAREFA : executa
+
+    TB_SESSOES_DIARIAS ||--o{ TB_ALOCACOES_ITENS : gera
+    TB_AMBIENTES ||--o{ TB_ALOCACOES_ITENS : recebe
+    TB_ITENS_AMBIENTE ||--o{ TB_ALOCACOES_ITENS : detalha
+    TB_COLABORADORES ||--o{ TB_ALOCACOES_ITENS : executa
+    TB_ALOCACOES_TAREFA ||--o{ TB_ALOCACOES_ITENS : legado
+
+    TB_ALOCACOES_TAREFA ||--o{ TB_MEDICOES : mede
+    TB_OBRAS ||--o{ TB_MEDICOES : consolida
+
+    TB_ALOCACOES_ITENS ||--o{ TB_MEDICOES_COLABORADOR : mede
+    TB_COLABORADORES ||--o{ TB_MEDICOES_COLABORADOR : produz
+    TB_ITENS_AMBIENTE ||--o{ TB_MEDICOES_COLABORADOR : referencia
+    TB_MEDICOES ||--o{ TB_MEDICOES_COLABORADOR : legado

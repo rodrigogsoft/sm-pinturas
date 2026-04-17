@@ -1,0 +1,1 @@
+export { ObrasPage } from './ObrasPage';
