@@ -31,6 +31,7 @@ import {
 } from '../services/relatorios.service';
 import { dashboardService, DashboardFinanceiro } from '../services/dashboard.service';
 import { useAppSelector } from '../hooks/redux';
+import { SM_COLORS } from '../theme/colors';
 
 type TipoRelatorio = 'dashboard' | 'excedentes' | 'ranking';
 
@@ -522,7 +523,7 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1976d2',
+    color: SM_COLORS.primary,
     marginTop: 4,
   },
   receita: {

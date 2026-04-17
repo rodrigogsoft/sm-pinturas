@@ -331,22 +331,28 @@ export const Layout = () => {
         {/* ───── AppBar ───── */}
         <AppBar
           position="fixed"
-          sx={{ zIndex: 1300, left: sidebarWidth, width: `calc(100% - ${sidebarWidth}px)`, transition: 'left 0.2s, width 0.2s' }}
+          elevation={0}
+          sx={{
+            zIndex: 1300,
+            left: sidebarWidth,
+            width: `calc(100% - ${sidebarWidth}px)`,
+            transition: 'left 0.2s, width 0.2s',
+            backgroundColor: '#FFFFFF',
+            borderBottom: '1px solid rgba(13,27,140,0.10)',
+            color: '#333333',
+          }}
         >
           <Toolbar>
-            <IconButton color="inherit" edge="start" onClick={() => setDrawerOpen((v) => !v)} sx={{ mr: 2 }}>
+            <IconButton edge="start" onClick={() => setDrawerOpen((v) => !v)} sx={{ mr: 2, color: '#0D1B8C' }}>
               {drawerOpen ? <ChevronLeft /> : <MenuIcon />}
             </IconButton>
-            <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-              <img src="/logo.png" alt="SM Pinturas & Construções" style={{ height: 36, objectFit: 'contain' }} />
-            </Box>
+            <Box sx={{ flexGrow: 1 }} />
             <Tooltip title="Baixar App Mobile (Android)">
               <IconButton
-                color="inherit"
                 component="a"
                 href="/downloads/app-jb-pinturas.apk"
                 download
-                sx={{ mr: 1 }}
+                sx={{ mr: 1, color: '#0D1B8C' }}
               >
                 <PhoneAndroid />
               </IconButton>
@@ -354,7 +360,7 @@ export const Layout = () => {
             {user && (
               <>
                 <Tooltip title="Notificações">
-                  <IconButton color="inherit" onClick={(e) => setNotificacoesAnchorEl(e.currentTarget)} sx={{ mr: 1 }}>
+                  <IconButton onClick={(e) => setNotificacoesAnchorEl(e.currentTarget)} sx={{ mr: 1, color: '#0D1B8C' }}>
                     <Badge badgeContent={naoLidasCount} color="error" max={99}>
                       <Notifications />
                     </Badge>
@@ -425,10 +431,9 @@ export const Layout = () => {
                 </Menu>
               </>
             )}
-            <AccessibilityModeToggle checked={highContrast} onChange={setHighContrast} />
             {user && (
               <>
-                <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ ml: 1 }}>
+                <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ ml: 1, color: '#0D1B8C' }}>
                   <AccountCircle />
                   <Typography variant="body2" sx={{ ml: 1 }}>
                     {user.nome_completo || user.email}
@@ -454,7 +459,7 @@ export const Layout = () => {
 
         {/* ───── Sidebar ───── */}
         <Paper
-          elevation={3}
+          elevation={4}
           square
           sx={{
             position: 'fixed',
@@ -468,13 +473,30 @@ export const Layout = () => {
             zIndex: 1200,
             display: 'flex',
             flexDirection: 'column',
+            background: 'linear-gradient(180deg, #0D1B8C 0%, #091470 100%)',
+            borderRadius: 0,
           }}
         >
-          {/* Espaçador para o AppBar */}
-          <Toolbar />
-          <Divider />
+          {/* Logo / cabeçalho da sidebar */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: drawerOpen ? 'flex-start' : 'center',
+              px: drawerOpen ? 2 : 0,
+              minHeight: 64,
+              borderBottom: '1px solid rgba(255,255,255,0.12)',
+            }}
+          >
+            <img
+              src="/logo.png"
+              alt="SM Pinturas"
+              style={{ height: 36, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+            />
 
-          <List dense sx={{ pt: 0.5 }}>
+          </Box>
+
+          <List dense sx={{ pt: 1, flex: 1 }}>
             {menuConfig.map((item) => {
               if (!podeVer(item.perfis) && !temPermissaoExplicita(item.moduloKey)) return null;
               if (!moduloAtivo(item.moduloKey)) return null;
@@ -491,10 +513,20 @@ export const Layout = () => {
                     <ListItemButton
                       selected={ativo}
                       onClick={() => { setObrasOpen((v) => !v); ir(item.path); }}
-                      sx={{ borderRadius: 1, mx: 0.5, minHeight: 44 }}
+                      sx={{
+                        borderRadius: 2,
+                        mx: 1,
+                        mb: 0.5,
+                        minHeight: 44,
+                        color: ativo ? '#FFFFFF' : 'rgba(255,255,255,0.75)',
+                        backgroundColor: ativo ? 'rgba(74,108,247,0.55)' : 'transparent',
+                        '&:hover': { backgroundColor: 'rgba(74,108,247,0.35)', color: '#FFFFFF' },
+                        '&.Mui-selected': { backgroundColor: 'rgba(74,108,247,0.55)' },
+                        '&.Mui-selected:hover': { backgroundColor: 'rgba(74,108,247,0.65)' },
+                      }}
                     >
                       <Tooltip title={!drawerOpen ? item.text : ''} placement="right">
-                        <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                        <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>{item.icon}</ListItemIcon>
                       </Tooltip>
                       {drawerOpen && (
                         <>
@@ -511,9 +543,19 @@ export const Layout = () => {
                             key={sub.path}
                             selected={isAtivo(sub.path)}
                             onClick={() => ir(sub.path)}
-                            sx={{ pl: 4, borderRadius: 1, mx: 0.5, minHeight: 38 }}
+                            sx={{
+                              pl: 4,
+                              borderRadius: 2,
+                              mx: 1,
+                              mb: 0.5,
+                              minHeight: 38,
+                              color: isAtivo(sub.path) ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                              backgroundColor: isAtivo(sub.path) ? 'rgba(74,108,247,0.55)' : 'transparent',
+                              '&:hover': { backgroundColor: 'rgba(74,108,247,0.25)', color: '#FFFFFF' },
+                              '&.Mui-selected': { backgroundColor: 'rgba(74,108,247,0.55)' },
+                            }}
                           >
-                            <ListItemIcon sx={{ minWidth: 32 }}>{sub.icon}</ListItemIcon>
+                            <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>{sub.icon}</ListItemIcon>
                             <ListItemText primary={sub.text} primaryTypographyProps={{ variant: 'body2' }} />
                           </ListItemButton>
                         ))}
@@ -528,10 +570,20 @@ export const Layout = () => {
                   key={item.path}
                   selected={isAtivo(item.path)}
                   onClick={() => ir(item.path)}
-                  sx={{ borderRadius: 1, mx: 0.5, minHeight: 44 }}
+                  sx={{
+                    borderRadius: 2,
+                    mx: 1,
+                    mb: 0.5,
+                    minHeight: 44,
+                    color: isAtivo(item.path) ? '#FFFFFF' : 'rgba(255,255,255,0.75)',
+                    backgroundColor: isAtivo(item.path) ? 'rgba(74,108,247,0.55)' : 'transparent',
+                    '&:hover': { backgroundColor: 'rgba(74,108,247,0.35)', color: '#FFFFFF' },
+                    '&.Mui-selected': { backgroundColor: 'rgba(74,108,247,0.55)' },
+                    '&.Mui-selected:hover': { backgroundColor: 'rgba(74,108,247,0.65)' },
+                  }}
                 >
                   <Tooltip title={!drawerOpen ? item.text : ''} placement="right">
-                    <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
+                    <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>{item.icon}</ListItemIcon>
                   </Tooltip>
                   {drawerOpen && <ListItemText primary={item.text} />}
                 </ListItemButton>
@@ -548,7 +600,8 @@ export const Layout = () => {
             p: 3,
             ml: `${sidebarWidth}px`,
             mt: '64px',
-            minHeight: '100vh',
+            minHeight: 'calc(100vh - 64px)',
+            backgroundColor: '#F2F2F2',
             transition: 'margin-left 0.2s',
           }}
         >

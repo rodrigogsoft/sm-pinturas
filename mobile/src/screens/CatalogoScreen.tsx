@@ -30,6 +30,7 @@ import {
   EstatisticasServico,
 } from '../services/servicos.service';
 import { apiClient } from '../services/api';
+import { SM_COLORS } from '../theme/colors';
 
 export const CatalogoScreen = ({ navigation }: any) => {
   const { width } = useWindowDimensions();
@@ -518,7 +519,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1976d2',
+    color: SM_COLORS.primary,
   },
   statLabel: {
     fontSize: 12,

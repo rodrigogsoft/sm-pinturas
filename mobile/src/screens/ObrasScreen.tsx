@@ -17,6 +17,7 @@ import { apiClient } from '../services/api';
 import { SessoesService } from '../services/sessoes.service';
 import { GeolocationService } from '../services/geolocation.service';
 import { Obra } from '../types';
+import { SM_COLORS } from '../theme/colors';
 
 const STATUS_OPCOES = ['PLANEJAMENTO', 'ATIVA', 'SUSPENSA', 'CONCLUIDA'];
 
@@ -354,7 +355,7 @@ export const ObrasScreen = ({ navigation }: any) => {
   if (loading && !refreshing) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color={SM_COLORS.primary} />
       </View>
     );
   }
@@ -544,7 +545,7 @@ const styles = StyleSheet.create({
   detalheValor: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1976d2',
+    color: SM_COLORS.primary,
   },
   fab: {
     position: 'absolute',
@@ -574,7 +575,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 16,
-    color: '#1976d2',
+    color: SM_COLORS.primary,
   },
   input: {
     marginBottom: 12,

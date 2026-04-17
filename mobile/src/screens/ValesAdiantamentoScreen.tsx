@@ -12,6 +12,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { apiClient } from '../services/api';
+import { SM_COLORS } from '../theme/colors';
 
 interface ValeAdiantamento {
   id: string;
@@ -111,7 +112,7 @@ export const ValesAdiantamentoScreen = () => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color={SM_COLORS.primary} />
       </View>
     );
   }

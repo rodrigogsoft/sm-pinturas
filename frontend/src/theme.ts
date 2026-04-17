@@ -1,98 +1,130 @@
 import { createTheme } from '@mui/material/styles';
 import { ptBR } from '@mui/material/locale';
 
+// ─────────────────────────────────────────────
+// Tokens de cor — SM Pinturas Design System
+// ─────────────────────────────────────────────
+export const SM_COLORS = {
+  primary:    '#0D1B8C', // azul escuro da logo
+  secondary:  '#4A6CF7', // azul claro — hover e elementos interativos
+  success:    '#34C759', // verde — indicadores positivos
+  warning:    '#FFD60A', // amarelo — notificações / status intermediário
+  orange:     '#FF7043', // laranja — accent complementar
+  error:      '#FF3B30', // vermelho — erros e alertas críticos
+  bgDefault:  '#F2F2F2', // cinza claro — background geral
+  bgPaper:    '#FFFFFF', // branco — cards e painéis
+  textPrimary:   '#333333',
+  textSecondary: '#666666',
+};
+
 export const theme = createTheme(
   {
     palette: {
       mode: 'light',
       primary: {
-        main: '#1976d2',
-        light: '#42a5f5',
-        dark: '#1565c0',
-        contrastText: '#fff',
+        main: SM_COLORS.primary,
+        light: SM_COLORS.secondary,
+        dark: '#09147A',
+        contrastText: '#FFFFFF',
       },
       secondary: {
-        main: '#dc004e',
-        light: '#e33371',
-        dark: '#9a0036',
-        contrastText: '#fff',
+        main: SM_COLORS.secondary,
+        light: '#7B96FF',
+        dark: '#2B4ED4',
+        contrastText: '#FFFFFF',
       },
       success: {
-        main: '#2e7d32',
-        light: '#4caf50',
-        dark: '#1b5e20',
+        main: SM_COLORS.success,
+        light: '#5EDB80',
+        dark: '#248A3D',
+        contrastText: '#FFFFFF',
       },
       warning: {
-        main: '#ed6c02',
-        light: '#ff9800',
-        dark: '#e65100',
+        main: SM_COLORS.warning,
+        light: '#FFE566',
+        dark: '#C9A800',
+        contrastText: '#333333',
       },
       error: {
-        main: '#d32f2f',
-        light: '#ef5350',
-        dark: '#c62828',
+        main: SM_COLORS.error,
+        light: '#FF6B63',
+        dark: '#C9231B',
+        contrastText: '#FFFFFF',
       },
       info: {
-        main: '#0288d1',
-        light: '#03a9f4',
-        dark: '#01579b',
+        main: SM_COLORS.orange,
+        light: '#FF9771',
+        dark: '#C9430D',
+        contrastText: '#FFFFFF',
       },
       background: {
-        default: '#f5f5f5',
-        paper: '#ffffff',
+        default: SM_COLORS.bgDefault,
+        paper:   SM_COLORS.bgPaper,
+      },
+      text: {
+        primary:   SM_COLORS.textPrimary,
+        secondary: SM_COLORS.textSecondary,
       },
     },
     typography: {
-      fontFamily: [
-        '-apple-system',
-        'BlinkMacSystemFont',
-        '"Segoe UI"',
-        'Roboto',
-        '"Helvetica Neue"',
-        'Arial',
-        'sans-serif',
-      ].join(','),
-      h1: {
-        fontSize: '2.5rem',
-        fontWeight: 500,
-      },
-      h2: {
-        fontSize: '2rem',
-        fontWeight: 500,
-      },
-      h3: {
-        fontSize: '1.75rem',
-        fontWeight: 500,
-      },
-      h4: {
-        fontSize: '1.5rem',
-        fontWeight: 500,
-      },
-      h5: {
-        fontSize: '1.25rem',
-        fontWeight: 500,
-      },
-      h6: {
-        fontSize: '1rem',
-        fontWeight: 500,
-      },
+      fontFamily: 'Inter, Roboto, "Helvetica Neue", Arial, sans-serif',
+      h1: { fontSize: '2.5rem', fontWeight: 700 },
+      h2: { fontSize: '2rem',   fontWeight: 700 },
+      h3: { fontSize: '1.75rem',fontWeight: 600 },
+      h4: { fontSize: '1.5rem', fontWeight: 600 },
+      h5: { fontSize: '1.25rem',fontWeight: 600 },
+      h6: { fontSize: '1rem',   fontWeight: 600 },
+      subtitle1: { fontWeight: 500 },
+      subtitle2: { fontWeight: 500 },
     },
     shape: {
-      borderRadius: 8,
+      borderRadius: 10,
     },
     components: {
       MuiButton: {
         styleOverrides: {
           root: {
             textTransform: 'none',
-            fontWeight: 500,
+            fontWeight: 600,
+            borderRadius: 8,
+          },
+          containedPrimary: {
+            background: `linear-gradient(135deg, ${SM_COLORS.primary} 0%, ${SM_COLORS.secondary} 100%)`,
+            '&:hover': {
+              background: `linear-gradient(135deg, #09147A 0%, ${SM_COLORS.primary} 100%)`,
+            },
           },
         },
       },
       MuiCard: {
         styleOverrides: {
           root: {
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            boxShadow: '0 2px 12px rgba(13,27,140,0.08)',
+            borderRadius: 12,
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            fontWeight: 600,
+            borderRadius: 6,
+          },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          head: {
+            fontWeight: 700,
+            backgroundColor: SM_COLORS.bgDefault,
+            color: SM_COLORS.textPrimary,
           },
         },
       },
@@ -100,7 +132,24 @@ export const theme = createTheme(
         styleOverrides: {
           root: {
             border: 'none',
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: SM_COLORS.bgDefault,
+              fontWeight: 700,
+            },
+            '& .MuiDataGrid-row:hover': {
+              backgroundColor: 'rgba(74,108,247,0.06)',
+            },
           },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: { borderRadius: 4 },
+        },
+      },
+      MuiAlert: {
+        styleOverrides: {
+          root: { borderRadius: 10 },
         },
       },
     } as any,

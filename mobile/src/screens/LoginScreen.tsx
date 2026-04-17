@@ -3,6 +3,7 @@ import {
   View,
   StyleSheet,
   Text,
+  Image,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -10,6 +11,7 @@ import {
 import { TextInput } from 'react-native-paper';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { loginAsync } from '../store/slices/authSlice';
+import { SM_COLORS } from '../theme/colors';
 
 export const LoginScreen = ({ navigation }: any) => {
   const dispatch = useAppDispatch();
@@ -36,8 +38,11 @@ export const LoginScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Text style={styles.logoText}>JB Pinturas</Text>
-        <Text style={styles.subtitleText}>App de Relatório de Obra</Text>
+        <Image
+          source={require('../../assets/logo.png')}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
       </View>
 
       <View style={styles.formContainer}>
@@ -92,27 +97,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingVertical: 40,
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 60,
+    marginBottom: 32,
   },
-  logoText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1976d2',
-    marginBottom: 8,
-  },
-  subtitleText: {
-    fontSize: 16,
-    color: '#666',
+  logoImage: {
+    width: 280,
+    height: 100,
   },
   formContainer: {
     paddingHorizontal: 20,
-    flex: 1,
     justifyContent: 'center',
   },
   input: {
@@ -126,7 +124,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   loginButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: SM_COLORS.primary,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',

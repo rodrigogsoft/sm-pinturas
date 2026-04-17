@@ -15,6 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useAppSelector } from '../hooks/redux';
 import { dashboardService } from '../services/dashboard.service';
 import { notificacoesService, Notificacao } from '../services/notificacoes.service';
+import { SM_COLORS } from '../theme/colors';
 
 export const HomeScreen = ({ navigation }: any) => {
   const { usuario } = useAppSelector((state) => state.auth);
@@ -111,7 +112,7 @@ export const HomeScreen = ({ navigation }: any) => {
             <Paragraph style={styles.greeting}>Olá,</Paragraph>
             <Title style={styles.userName}>{usuario?.nome?.split(' ')[0]}</Title>
           </View>
-          <MaterialCommunityIcons name="account-circle" size={50} color="#1976d2" />
+          <MaterialCommunityIcons name="account-circle" size={50} color={SM_COLORS.primary} />
         </View>
 
         {/* Status Offline/Online */}
@@ -137,7 +138,7 @@ export const HomeScreen = ({ navigation }: any) => {
                 <MaterialCommunityIcons
                   name="briefcase"
                   size={40}
-                  color="#1976d2"
+                  color={SM_COLORS.primary}
                   style={styles.cardIcon}
                 />
               </View>
@@ -333,7 +334,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1976d2',
+    color: SM_COLORS.primary,
   },
   statusBar: {
     flexDirection: 'row',
@@ -368,7 +369,7 @@ const styles = StyleSheet.create({
   cardValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1976d2',
+    color: SM_COLORS.primary,
   },
   cardIcon: {
     opacity: 0.3,
@@ -385,11 +386,11 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginBottom: 8,
-    borderColor: '#1976d2',
+    borderColor: SM_COLORS.primary,
     borderWidth: 1,
   },
   buttonLabel: {
-    color: '#1976d2',
+    color: SM_COLORS.primary,
     fontSize: 14,
   },
   notificacoes: {
@@ -411,7 +412,7 @@ const styles = StyleSheet.create({
   },
   notificacaoNaoLida: {
     borderLeftWidth: 3,
-    borderLeftColor: '#1976d2',
+    borderLeftColor: SM_COLORS.primary,
   },
   notifRow: {
     flexDirection: 'row',

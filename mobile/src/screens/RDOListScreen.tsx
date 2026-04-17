@@ -15,6 +15,7 @@ import { sincronizarRDOs, carregarRDOsLocais } from '../store/slices/rdoSlice';
 import { SessoesService } from '../services/sessoes.service';
 import { AlocacoesService } from '../services/alocacoes.service';
 import { apiClient } from '../services/api';
+import { SM_COLORS } from '../theme/colors';
 
 export const RDOListScreen = ({ navigation }: any) => {
   const dispatch = useAppDispatch();
@@ -506,7 +507,7 @@ const styles = StyleSheet.create({
   rdoDate: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1976d2',
+    color: SM_COLORS.primary,
   },
   rdoDetails: {
     flexDirection: 'row',
@@ -529,7 +530,7 @@ const styles = StyleSheet.create({
   detailValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1976d2',
+    color: SM_COLORS.primary,
   },
   observacoes: {
     fontSize: 12,

@@ -7,12 +7,13 @@ import { restaurarSessaoAsync } from '../store/slices/authSlice';
 import { LoginScreen } from '../screens/LoginScreen';
 import { DrawerNavigator } from './DrawerNavigator';
 import { RDOFormScreen } from '../screens/RDOFormScreen';
+import { SM_COLORS } from '../theme/colors';
 
 const Stack = createNativeStackNavigator();
 
 const HEADER_OPTS = {
-  headerStyle: { backgroundColor: '#1976d2' },
-  headerTintColor: '#fff',
+  headerStyle: { backgroundColor: SM_COLORS.primary },
+  headerTintColor: SM_COLORS.textOnDark,
   headerTitleStyle: { fontWeight: '600' as const, fontSize: 18 },
 };
 
@@ -27,8 +28,8 @@ export const RootNavigator = () => {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' }}>
-        <ActivityIndicator size="large" color="#1976d2" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: SM_COLORS.background }}>
+        <ActivityIndicator size="large" color={SM_COLORS.primary} />
       </View>
     );
   }

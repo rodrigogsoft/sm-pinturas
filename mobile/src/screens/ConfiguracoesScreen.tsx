@@ -11,6 +11,7 @@ import { List, Card, Title, Paragraph, Button, Divider } from 'react-native-pape
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { logoutAsync } from '../store/slices/authSlice';
+import { SM_COLORS } from '../theme/colors';
 
 export const ConfiguracoesScreen = ({ navigation }: any) => {
   const { usuario } = useAppSelector((state) => state.auth);
@@ -51,7 +52,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
               <MaterialCommunityIcons
                 name="account-circle"
                 size={60}
-                color="#1976d2"
+                color={SM_COLORS.primary}
               />
               <View style={styles.profileInfo}>
                 <Title style={styles.profileName}>{usuario?.nome_completo}</Title>
@@ -72,7 +73,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
             title="Notificações"
             description="Ative ou desative notificações push"
             left={(props) => (
-              <MaterialCommunityIcons name="bell" size={24} color="#1976d2" />
+              <MaterialCommunityIcons name="bell" size={24} color={SM_COLORS.primary} />
             )}
             right={() => (
               <Switch
@@ -88,7 +89,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
             title="Sincronização Automática"
             description="Sincronize dados automaticamente com internet"
             left={(props) => (
-              <MaterialCommunityIcons name="sync" size={24} color="#1976d2" />
+              <MaterialCommunityIcons name="sync" size={24} color={SM_COLORS.primary} />
             )}
             right={() => (
               <Switch
@@ -107,7 +108,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
               <MaterialCommunityIcons
                 name="moon-waning-crescent"
                 size={24}
-                color="#1976d2"
+                color={SM_COLORS.primary}
               />
             )}
             right={() => <Switch value={false} onValueChange={() => {}} />}
@@ -122,7 +123,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
               <MaterialCommunityIcons
                 name="contrast-box"
                 size={24}
-                color="#1976d2"
+                color={SM_COLORS.primary}
               />
             )}
             right={() => <Switch value={false} onValueChange={() => {}} />}
@@ -140,7 +141,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
               <MaterialCommunityIcons
                 name="information"
                 size={24}
-                color="#1976d2"
+                color={SM_COLORS.primary}
               />
             )}
           />
@@ -154,7 +155,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
               <MaterialCommunityIcons
                 name="help-circle"
                 size={24}
-                color="#1976d2"
+                color={SM_COLORS.primary}
               />
             )}
             onPress={() => {
@@ -171,7 +172,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
             title="Suporte"
             description="Entre em contato conosco"
             left={(props) => (
-              <MaterialCommunityIcons name="phone" size={24} color="#1976d2" />
+              <MaterialCommunityIcons name="phone" size={24} color={SM_COLORS.primary} />
             )}
             onPress={() => {
               Alert.alert('Suporte', 'Email: suporte@jbpinturas.com.br\nTel: (11) 3000-0000');
@@ -187,7 +188,7 @@ export const ConfiguracoesScreen = ({ navigation }: any) => {
               <MaterialCommunityIcons
                 name="file-document"
                 size={24}
-                color="#1976d2"
+                color={SM_COLORS.primary}
               />
             )}
           />
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
   },
   profileRole: {
     fontSize: 12,
-    color: '#1976d2',
+    color: SM_COLORS.primary,
     marginBottom: 2,
   },
   profileEmail: {

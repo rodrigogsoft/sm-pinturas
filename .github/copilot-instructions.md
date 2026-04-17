@@ -52,11 +52,63 @@ Cada módulo fica em `backend/src/modules/{modulo}/` com os arquivos:
 - Colunas `GENERATED ALWAYS AS STORED` não devem ser adicionadas às entidades TypeORM sem a coluna existir no banco.
 - Nunca usar `git push --force` nas branches `homol` e `producao`.
 
-## Fluxo de branches
+## Controle de versão e fluxo de branches
+
+### Estrutura de branches
+
+| Branch | Papel |
+|--------|-------|
+| `master` | Produção — só código aprovado e testado; deploy automático |
+| `homol` | Homologação/staging — integração de features para QA |
+| `feature/*` | Desenvolvimento de cada feature ou bugfix |
+
+### Fluxo de trabalho
 
 ```
-feature/* → main → homol → producao
+feature/* → homol → master
 ```
+
+1. **Criar branch a partir de homol:**
+   ```bash
+   git checkout homol
+   git checkout -b feature/nome-da-feature
+   ```
+
+2. **Commits com mensagens convencionais:**
+   ```bash
+   git commit -m "feat(login): adicionar autenticação via JWT"
+   git commit -m "fix(medicoes): corrigir cálculo de excedente"
+   ```
+
+3. **Abrir PR para homol** — exige revisão de código + aprovação de QA antes do merge.
+
+4. **Merge em homol:**
+   ```bash
+   git checkout homol
+   git merge feature/nome-da-feature
+   git push origin homol
+   ```
+
+5. **Testes em homol** — integração, E2E, validação de UX. Correções na branch de feature e update do PR.
+
+6. **PR de homol → master** — revisão final. Merge aprovado dispara deploy em produção.
+
+### Versionamento semântico (tags)
+
+```bash
+git checkout master
+git tag -a v1.0.0 -m "Release 1.0.0"
+git push origin v1.0.0
+```
+
+Formato: `vMAJOR.MINOR.PATCH` — facilita rollback e histórico de releases.
+
+### Regras de proteção
+
+- `master` e `homol` protegidas — apenas merges via PR aprovada.
+- Nunca usar `git push --force` em `master` ou `homol`.
+- CI/CD deve rodar testes automáticos antes de qualquer merge.
+- Changelog automatizado com commits convencionais (`feat`, `fix`, `chore`, `docs`, `refactor`).
 
 ## Design System — Frontend
 

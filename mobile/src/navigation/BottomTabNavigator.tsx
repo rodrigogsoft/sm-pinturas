@@ -2,6 +2,13 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { SM_COLORS } from '../theme/colors';
+
+const STACK_HEADER_OPTS = {
+  headerStyle: { backgroundColor: SM_COLORS.primary },
+  headerTintColor: SM_COLORS.textOnDark,
+  headerTitleStyle: { fontWeight: '600' as const },
+};
 
 // Screens
 import { HomeScreen } from '../screens/HomeScreen';
@@ -23,9 +30,7 @@ const Stack = createNativeStackNavigator();
 const ObrasStack = () => (
   <Stack.Navigator
     screenOptions={{
-      headerStyle: { backgroundColor: '#1976d2' },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: '600' },
+      ...STACK_HEADER_OPTS,
     }}
   >
     <Stack.Screen
@@ -50,9 +55,7 @@ const ObrasStack = () => (
 const RDOStack = () => (
   <Stack.Navigator
     screenOptions={{
-      headerStyle: { backgroundColor: '#1976d2' },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: '600' },
+      ...STACK_HEADER_OPTS,
     }}
   >
     <Stack.Screen
@@ -67,9 +70,7 @@ const RDOStack = () => (
 const MedicoesStack = () => (
   <Stack.Navigator
     screenOptions={{
-      headerStyle: { backgroundColor: '#1976d2' },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: '600' },
+      ...STACK_HEADER_OPTS,
     }}
   >
     <Stack.Screen
@@ -84,9 +85,7 @@ const MedicoesStack = () => (
 const CatalogoStack = () => (
   <Stack.Navigator
     screenOptions={{
-      headerStyle: { backgroundColor: '#1976d2' },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: '600' },
+      ...STACK_HEADER_OPTS,
     }}
   >
     <Stack.Screen
@@ -101,9 +100,7 @@ const CatalogoStack = () => (
 const RelatoriosStack = () => (
   <Stack.Navigator
     screenOptions={{
-      headerStyle: { backgroundColor: '#1976d2' },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: '600' },
+      ...STACK_HEADER_OPTS,
     }}
   >
     <Stack.Screen
@@ -118,9 +115,7 @@ const RelatoriosStack = () => (
 const FinanceiroStack = () => (
   <Stack.Navigator
     screenOptions={{
-      headerStyle: { backgroundColor: '#1976d2' },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: '600' },
+      ...STACK_HEADER_OPTS,
     }}
   >
     <Stack.Screen
@@ -140,9 +135,7 @@ const FinanceiroStack = () => (
 const ConfigStack = () => (
   <Stack.Navigator
     screenOptions={{
-      headerStyle: { backgroundColor: '#1976d2' },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: '600' },
+      ...STACK_HEADER_OPTS,
     }}
   >
     <Stack.Screen
@@ -181,11 +174,11 @@ export const BottomTabNavigator = () => {
             <MaterialCommunityIcons name={iconName} size={size} color={color} />
           );
         },
-        tabBarActiveTintColor: '#1976d2',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: SM_COLORS.primary,
+        tabBarInactiveTintColor: SM_COLORS.textDisabled,
         tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopColor: '#e0e0e0',
+          backgroundColor: SM_COLORS.surface,
+          borderTopColor: SM_COLORS.divider,
           paddingBottom: 5,
           paddingTop: 5,
           height: 60,

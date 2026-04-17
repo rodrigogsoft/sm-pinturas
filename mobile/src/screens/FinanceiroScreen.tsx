@@ -15,6 +15,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiClient } from '../services/api';
+import { SM_COLORS } from '../theme/colors';
 
 interface ResumoFinanceiro {
   total_lotes: number;
@@ -36,7 +37,7 @@ interface LotePagamento {
 const STATUS_COR: Record<string, string> = {
   RASCUNHO: '#607d8b',
   AGUARDANDO_APROVACAO: '#ff9800',
-  APROVADO: '#1976d2',
+  APROVADO: SM_COLORS.primary,
   PROCESSANDO: '#9c27b0',
   PAGO: '#4caf50',
   CANCELADO: '#f44336',
@@ -114,7 +115,7 @@ export const FinanceiroScreen = ({ navigation }: any) => {
     {
       label: 'Vales de\nAdiantamento',
       icon: 'cash-multiple',
-      color: '#1976d2',
+      color: SM_COLORS.primary,
       tela: 'ValesAdiantamento',
     },
     {
@@ -139,7 +140,7 @@ export const FinanceiroScreen = ({ navigation }: any) => {
 
   if (loading) {
     return (
-      <View style={styles.center}><ActivityIndicator size="large" color="#1976d2" /></View>
+      <View style={styles.center}><ActivityIndicator size="large" color={SM_COLORS.primary} /></View>
     );
   }
 
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
   badgeText: { color: '#fff', fontSize: 11, fontWeight: '600' },
   sub: { fontSize: 12, color: '#666', marginBottom: 4 },
   loteValores: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
-  valorTotal: { fontSize: 16, fontWeight: '700', color: '#1976d2' },
+  valorTotal: { fontSize: 16, fontWeight: '700', color: SM_COLORS.primary },
   qtdMedicoes: { fontSize: 12, color: '#888' },
   empty: { alignItems: 'center', padding: 24 },
   emptyText: { color: '#999', fontSize: 15 },

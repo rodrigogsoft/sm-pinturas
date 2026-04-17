@@ -25,6 +25,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiClient } from '../services/api';
+import { SM_COLORS } from '../theme/colors';
 
 interface Cliente {
   id: string;
@@ -164,7 +165,7 @@ export const ClientesScreen = () => {
   const renderItem = ({ item }: { item: Cliente }) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
-        <MaterialCommunityIcons name="domain" size={32} color="#1976d2" style={styles.icon} />
+        <MaterialCommunityIcons name="domain" size={32} color={SM_COLORS.primary} style={styles.icon} />
         <View style={styles.info}>
           <Text style={styles.nome}>{item.razao_social}</Text>
           <Text style={styles.sub}>{item.cnpj_nif}</Text>
@@ -182,7 +183,7 @@ export const ClientesScreen = () => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color={SM_COLORS.primary} />
       </View>
     );
   }
@@ -322,7 +323,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
     bottom: 16,
-    backgroundColor: '#1976d2',
+    backgroundColor: SM_COLORS.primary,
   },
   modal: {
     backgroundColor: '#fff',
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
   modalTitulo: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1976d2',
+    color: SM_COLORS.primary,
     marginBottom: 16,
   },
   input: { marginBottom: 12 },

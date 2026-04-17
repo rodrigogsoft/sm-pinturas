@@ -20,11 +20,13 @@ import { ValesAdiantamentoScreen } from '../screens/ValesAdiantamentoScreen';
 import { UsuariosScreen } from '../screens/UsuariosScreen';
 import { RDOListScreen } from '../screens/RDOListScreen';
 
+import { SM_COLORS } from '../theme/colors';
+
 const Drawer = createDrawerNavigator();
 
 const HEADER_OPTS = {
-  headerStyle: { backgroundColor: '#1976d2' },
-  headerTintColor: '#fff',
+  headerStyle: { backgroundColor: SM_COLORS.primary },
+  headerTintColor: SM_COLORS.textOnDark,
 };
 
 const drawerStyles = StyleSheet.create({
@@ -112,8 +114,8 @@ export const DrawerNavigator = () => (
     drawerContent={(props) => <CustomDrawerContent {...props} />}
     screenOptions={{
       ...HEADER_OPTS,
-      drawerActiveTintColor: '#1976d2',
-      drawerInactiveTintColor: '#666',
+      drawerActiveTintColor: SM_COLORS.secondary,
+      drawerInactiveTintColor: SM_COLORS.textSecondary,
       drawerLabelStyle: { fontSize: 14, fontWeight: '500' },
     }}
   >

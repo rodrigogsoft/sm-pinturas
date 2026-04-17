@@ -24,6 +24,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useFocusEffect } from '@react-navigation/native';
 import { apiClient } from '../services/api';
 import { useAppSelector } from '../hooks/redux';
+import { SM_COLORS } from '../theme/colors';
 
 interface Usuario {
   id: string;
@@ -153,7 +154,7 @@ export const UsuariosScreen = () => {
   const renderItem = ({ item }: { item: Usuario }) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
-        <MaterialCommunityIcons name="account-circle-outline" size={32} color="#1976d2" style={styles.icon} />
+        <MaterialCommunityIcons name="account-circle-outline" size={32} color={SM_COLORS.primary} style={styles.icon} />
         <View style={styles.info}>
           <Text style={styles.nome}>{item.nome_completo}</Text>
           <Text style={styles.sub}>{item.email}</Text>
@@ -185,7 +186,7 @@ export const UsuariosScreen = () => {
   );
 
   if (loading) {
-    return <View style={styles.center}><ActivityIndicator size="large" color="#1976d2" /></View>;
+    return <View style={styles.center}><ActivityIndicator size="large" color={SM_COLORS.primary} /></View>;
   }
 
   return (
@@ -260,9 +261,9 @@ const styles = StyleSheet.create({
   chip: { height: 22 },
   actions: { flexDirection: 'row' },
   emptyText: { color: '#999', fontSize: 15 },
-  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#1976d2' },
+  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: SM_COLORS.primary },
   modal: { backgroundColor: '#fff', margin: 16, borderRadius: 12, padding: 20, maxHeight: '90%' },
-  modalTitulo: { fontSize: 18, fontWeight: '700', color: '#1976d2', marginBottom: 16 },
+  modalTitulo: { fontSize: 18, fontWeight: '700', color: SM_COLORS.primary, marginBottom: 16 },
   input: { marginBottom: 12 },
   fieldLabel: { fontSize: 13, color: '#555', marginBottom: 6 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16 },

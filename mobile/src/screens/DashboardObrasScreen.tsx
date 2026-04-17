@@ -12,6 +12,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { apiClient } from '../services/api';
+import { SM_COLORS } from '../theme/colors';
 
 interface ObraProgresso {
   id: string;
@@ -129,7 +130,7 @@ export const DashboardObrasScreen = ({ navigation }: any) => {
       <View style={styles.card}>
         <TouchableOpacity onPress={() => expandirObra(item.id)} activeOpacity={0.8}>
           <View style={styles.cardHeader}>
-            <MaterialCommunityIcons name="office-building" size={20} color="#1976d2" />
+            <MaterialCommunityIcons name="office-building" size={20} color={SM_COLORS.primary} />
             <Text style={styles.nomeObra}>{item.nome}</Text>
             <MaterialCommunityIcons
               name={expandida ? 'chevron-up' : 'chevron-down'}
@@ -157,7 +158,7 @@ export const DashboardObrasScreen = ({ navigation }: any) => {
         {expandida && (
           <View style={styles.detalhe}>
             {carregandoPavs ? (
-              <ActivityIndicator size="small" color="#1976d2" style={{ margin: 8 }} />
+              <ActivityIndicator size="small" color={SM_COLORS.primary} style={{ margin: 8 }} />
             ) : pavs.length === 0 ? (
               <Text style={styles.semDados}>Sem pavimentos cadastrados.</Text>
             ) : (
@@ -185,7 +186,7 @@ export const DashboardObrasScreen = ({ navigation }: any) => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color={SM_COLORS.primary} />
       </View>
     );
   }

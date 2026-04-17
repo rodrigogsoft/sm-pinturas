@@ -26,6 +26,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiClient } from '../services/api';
+import { SM_COLORS } from '../theme/colors';
 
 interface Colaborador {
   id: string;
@@ -172,7 +173,7 @@ export const ColaboradoresScreen = () => {
         <MaterialCommunityIcons
           name="account-hard-hat-outline"
           size={32}
-          color="#1976d2"
+          color={SM_COLORS.primary}
           style={styles.icon}
         />
         <View style={styles.info}>
@@ -203,7 +204,7 @@ export const ColaboradoresScreen = () => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color={SM_COLORS.primary} />
       </View>
     );
   }
@@ -301,7 +302,7 @@ export const ColaboradoresScreen = () => {
                 <Switch
                   value={form.ativo}
                   onValueChange={(v) => setForm((f) => ({ ...f, ativo: v }))}
-                  color="#1976d2"
+                  color={SM_COLORS.primary}
                 />
               </View>
               <View style={styles.modalActions}>
@@ -352,7 +353,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
     bottom: 16,
-    backgroundColor: '#1976d2',
+    backgroundColor: SM_COLORS.primary,
   },
   modal: {
     backgroundColor: '#fff',
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
     padding: 20,
     maxHeight: '90%',
   },
-  modalTitulo: { fontSize: 18, fontWeight: '700', color: '#1976d2', marginBottom: 16 },
+  modalTitulo: { fontSize: 18, fontWeight: '700', color: SM_COLORS.primary, marginBottom: 16 },
   input: { marginBottom: 12 },
   switchRow: {
     flexDirection: 'row',

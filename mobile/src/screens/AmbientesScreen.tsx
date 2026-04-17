@@ -23,6 +23,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiClient } from '../services/api';
+import { SM_COLORS } from '../theme/colors';
 
 interface Obra {
   id: string;
@@ -169,7 +170,7 @@ export const AmbientesScreen = () => {
   const renderItem = ({ item }: { item: Ambiente }) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
-        <MaterialCommunityIcons name="floor-plan" size={28} color="#1976d2" style={styles.icon} />
+        <MaterialCommunityIcons name="floor-plan" size={28} color={SM_COLORS.primary} style={styles.icon} />
         <View style={styles.info}>
           <Text style={styles.nome}>{item.nome}</Text>
           <Text style={styles.sub}>
@@ -189,7 +190,7 @@ export const AmbientesScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}><ActivityIndicator size="large" color="#1976d2" /></View>
+      <View style={styles.center}><ActivityIndicator size="large" color={SM_COLORS.primary} /></View>
     );
   }
 
@@ -325,9 +326,9 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row' },
   chipOption: { marginRight: 6 },
   emptyText: { color: '#999', fontSize: 15 },
-  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#1976d2' },
+  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: SM_COLORS.primary },
   modal: { backgroundColor: '#fff', margin: 16, borderRadius: 12, padding: 20, maxHeight: '90%' },
-  modalTitulo: { fontSize: 18, fontWeight: '700', color: '#1976d2', marginBottom: 16 },
+  modalTitulo: { fontSize: 18, fontWeight: '700', color: SM_COLORS.primary, marginBottom: 16 },
   input: { marginBottom: 12 },
   fieldLabel: { fontSize: 13, color: '#555', marginBottom: 6 },
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8, gap: 12 },

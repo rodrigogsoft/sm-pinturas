@@ -369,7 +369,7 @@ export const AlocacaoScreen = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color={SM_COLORS.primary} />
         <Text style={styles.loadingText}>Carregando alocacoes...</Text>
       </View>
     );
@@ -382,7 +382,7 @@ export const AlocacaoScreen = () => {
             <Card.Content>
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
-                  <Icon name="account-group" size={24} color="#1976d2" />
+                  <Icon name="account-group" size={24} color={SM_COLORS.primary} />
                   <Text style={styles.statValue}>{estatisticas.colaboradores_ativos}</Text>
                   <Text style={styles.statLabel}>Ativos</Text>
                 </View>
@@ -817,3 +817,4 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+import { SM_COLORS } from '../../theme/colors';
