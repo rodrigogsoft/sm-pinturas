@@ -61,7 +61,7 @@ export const ApropriacoesFinanceirasPage = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const { showToast } = useToast();
-  const isGestorOuAdmin = user?.id_perfil <= 2;
+  const isGestorOuAdmin = (user?.id_perfil ?? 99) <= 2;
 
   const [obras, setObras] = useState<Obra[]>([]);
   const [obraSelecionada, setObraSelecionada] = useState('');
