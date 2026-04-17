@@ -25,7 +25,7 @@ export class Obra {
   @JoinColumn({ name: 'cliente_id' })
   cliente: Cliente;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ name: 'cliente_id', type: 'uuid', nullable: true })
   clienteId: string;
 
   @Column({ default: false })

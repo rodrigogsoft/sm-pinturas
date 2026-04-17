@@ -36,7 +36,6 @@ CREATE TABLE IF NOT EXISTS tb_obras (
     "dataPrevisaoFim" DATE,
     status VARCHAR(30) NOT NULL DEFAULT 'EM_ANDAMENTO',
     cliente_id UUID REFERENCES tb_clientes(id),
-    "clienteId" UUID,
     deletado BOOLEAN NOT NULL DEFAULT FALSE,
     "criadoEm" TIMESTAMP NOT NULL DEFAULT NOW(),
     "atualizadoEm" TIMESTAMP NOT NULL DEFAULT NOW()

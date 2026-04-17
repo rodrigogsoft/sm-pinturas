@@ -14,10 +14,14 @@ import { UsuariosModule } from '../usuarios/usuarios.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'secret_fallback',
-        signOptions: { expiresIn: '8h' },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const jwtSecret = configService.get<string>('JWT_SECRET');
+        if (!jwtSecret) throw new Error('JWT_SECRET env variable is not set');
+        return {
+          secret: jwtSecret,
+          signOptions: { expiresIn: '8h' },
+        };
+      },
     }),
   ],
   providers: [AuthService, JwtStrategy],
