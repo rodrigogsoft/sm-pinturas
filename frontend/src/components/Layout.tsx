@@ -14,7 +14,6 @@ import {
   Menu,
   MenuItem,
   Collapse,
-  Divider,
   ThemeProvider,
   Tooltip,
   Paper,
@@ -45,7 +44,6 @@ import {
   Notifications,
 } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
-import { AccessibilityModeToggle } from './AccessibilityModeToggle';
 import { useHighContrastTheme } from '../hooks/useHighContrast';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, PerfilEnum } from '../store/slices/authSlice';
@@ -151,7 +149,7 @@ const menuConfig = [
 ];
 
 export const Layout = () => {
-  const { theme, highContrast, setHighContrast } = useHighContrastTheme();
+  const { theme } = useHighContrastTheme();
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [obrasOpen, setObrasOpen] = useState(() =>
     ['/obras', '/pavimentos', '/ambientes', '/itens-ambiente', '/sessoes'].includes(window.location.pathname),
