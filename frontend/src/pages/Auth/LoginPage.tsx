@@ -115,9 +115,6 @@ export const LoginPage = () => {
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
             <img src="/logo.png" alt="SM Pinturas & Construções" style={{ maxWidth: 280, height: 'auto' }} />
           </Box>
-          <Typography variant="body2" align="center" color="textSecondary" sx={{ mb: 3 }}>
-            Sistema de Gestão de Obras
-          </Typography>
 
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -171,10 +168,7 @@ export const LoginPage = () => {
             </Button>
           </form>
 
-          <Typography variant="body2" align="center" color="textSecondary" sx={{ mt: 3 }}>
-            Credenciais de teste:<br/>
-            admin@jbpinturas.com.br / Admin@2026
-          </Typography>
+
         </Paper>
       </Box>
     </Container>
