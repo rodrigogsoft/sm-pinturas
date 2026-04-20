@@ -40,11 +40,15 @@ CMD ["npm", "run", "dev"]
 # Etapa de produção com nginx (deve ser a última!)
 FROM nginx:alpine AS production
 
+# Hostname do backend na rede Docker (ex: backend-prod, backend-homol)
+ARG BACKEND_HOST=backend-prod
+ENV BACKEND_HOST=$BACKEND_HOST
+
 # Copiar build
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copiar configuração nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copiar configuração nginx como template
+COPY nginx.conf /etc/nginx/conf.d/default.conf.template
 
 # Expor porta
 EXPOSE 80
@@ -53,4 +57,5 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s \
   CMD wget --quiet --tries=1 --spider http://localhost:80 || exit 1
 
-CMD ["nginx", "-g", "daemon off;"]
+# Substitui $BACKEND_HOST no template e inicia nginx
+CMD ["sh", "-c", "envsubst '$BACKEND_HOST' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
