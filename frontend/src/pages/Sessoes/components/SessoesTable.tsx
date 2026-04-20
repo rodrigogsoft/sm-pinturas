@@ -28,9 +28,27 @@ import {
   CardContent,
   Divider,
   Link,
+  LinearProgress,
+  Tooltip,
 } from '@mui/material';
-import { Visibility } from '@mui/icons-material';
+import { Visibility, Person } from '@mui/icons-material';
 import { Sessao } from '../../../services/sessoes.service';
+import alocacoesService from '../../../services/alocacoes.service';
+
+interface AlocacaoDetalhada {
+  id: string;
+  status: string;
+  colaborador?: { id: string; nome_completo?: string };
+  ambiente?: { nome?: string; pavimento?: { nome?: string } };
+  item_ambiente?: {
+    id: string;
+    nome_elemento?: string | null;
+    area_planejada: number;
+    area_medida_total: number;
+    progresso: number;
+    status: string;
+  } | null;
+}
 
 interface SessoesTableProps {
   sessoes: Sessao[];
@@ -52,6 +70,8 @@ const SessoesTable: React.FC<SessoesTableProps> = ({
   const [dialogEncerrar, setDialogEncerrar] = useState(false);
   const [dialogVisualizar, setDialogVisualizar] = useState(false);
   const [sessaoVisualizar, setSessaoVisualizar] = useState<Sessao | null>(null);
+  const [alocacoesSessao, setAlocacoesSessao] = useState<AlocacaoDetalhada[]>([]);
+  const [loadingAlocacoes, setLoadingAlocacoes] = useState(false);
   const [observacoes, setObservacoes] = useState('');
   const [justificativa, setJustificativa] = useState('');
   const [nomeConferente, setNomeConferente] = useState('');
@@ -156,9 +176,19 @@ const SessoesTable: React.FC<SessoesTableProps> = ({
     }
   };
 
-  const handleVisualizarSessao = (sessao: Sessao) => {
+  const handleVisualizarSessao = async (sessao: Sessao) => {
     setSessaoVisualizar(sessao);
     setDialogVisualizar(true);
+    setAlocacoesSessao([]);
+    try {
+      setLoadingAlocacoes(true);
+      const response = await alocacoesService.listar({ id_sessao: sessao.id });
+      setAlocacoesSessao(response.data ?? []);
+    } catch {
+      // silencia erros de carregamento das alocações
+    } finally {
+      setLoadingAlocacoes(false);
+    }
   };
 
   const formatarData = (data: string) => {
@@ -566,6 +596,80 @@ const SessoesTable: React.FC<SessoesTableProps> = ({
                   </CardContent>
                 </Card>
               )}
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Colaboradores Alocados */}
+              <Card sx={{ mb: 2 }}>
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Person fontSize="small" /> Colaboradores Alocados
+                  </Typography>
+                  {loadingAlocacoes ? (
+                    <Box display="flex" justifyContent="center" py={2}>
+                      <CircularProgress size={24} />
+                    </Box>
+                  ) : alocacoesSessao.length === 0 ? (
+                    <Typography variant="body2" color="textSecondary">
+                      Nenhuma alocação registrada nesta sessão.
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                      {alocacoesSessao.map((aloc) => {
+                        const nomeColaborador = aloc.colaborador?.nome_completo ?? '—';
+                        const nomeServico = aloc.item_ambiente?.nome_elemento
+                          ?? aloc.ambiente?.nome
+                          ?? '—';
+                        const localizacao = [
+                          aloc.ambiente?.pavimento?.nome,
+                          aloc.ambiente?.nome,
+                        ].filter(Boolean).join(' / ');
+                        const progresso = aloc.item_ambiente?.progresso ?? null;
+                        const statusCor =
+                          aloc.status === 'EM_ANDAMENTO' ? 'warning'
+                          : aloc.status === 'CONCLUIDO' ? 'success'
+                          : 'default';
+                        const statusLabel =
+                          aloc.status === 'EM_ANDAMENTO' ? 'Em andamento'
+                          : aloc.status === 'CONCLUIDO' ? 'Concluído'
+                          : aloc.status === 'PAUSADO' ? 'Pausado'
+                          : aloc.status;
+
+                        return (
+                          <Box key={aloc.id} sx={{ p: 1.5, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
+                              <Box>
+                                <Typography variant="body2" fontWeight="bold">{nomeColaborador}</Typography>
+                                <Typography variant="body2" color="text.secondary">{nomeServico}</Typography>
+                                {localizacao && (
+                                  <Typography variant="caption" color="text.disabled">{localizacao}</Typography>
+                                )}
+                              </Box>
+                              <Chip label={statusLabel} color={statusCor as any} size="small" />
+                            </Box>
+                            {progresso !== null && (
+                              <Box sx={{ mt: 1 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                  <Typography variant="caption" color="text.secondary">Progresso</Typography>
+                                  <Typography variant="caption" fontWeight="bold">{Number(progresso).toFixed(1)}%</Typography>
+                                </Box>
+                                <Tooltip title={`${Number(progresso).toFixed(1)}%`}>
+                                  <LinearProgress
+                                    variant="determinate"
+                                    value={Math.min(Number(progresso), 100)}
+                                    sx={{ height: 6, borderRadius: 3 }}
+                                    color={Number(progresso) >= 100 ? 'success' : 'primary'}
+                                  />
+                                </Tooltip>
+                              </Box>
+                            )}
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
 
               <Divider sx={{ my: 2 }} />
 
