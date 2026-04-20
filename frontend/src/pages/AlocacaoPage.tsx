@@ -31,6 +31,7 @@ import {
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { api } from '../services/api';
@@ -198,6 +199,16 @@ export const AlocacaoPage: React.FC = () => {
   const [observacoes, setObservacoes] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
+
+  // Dialog de edição
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [alocacaoEditando, setAlocacaoEditando] = useState<AlocacaoAtiva | null>(null);
+  const [editColaborador, setEditColaborador] = useState('');
+  const [editServico, setEditServico] = useState('');
+  const [editPrecoCusto, setEditPrecoCusto] = useState('');
+  const [editObservacoes, setEditObservacoes] = useState('');
+  const [editError, setEditError] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
 
   const normalizarAlocacoes = (
     alocacoesRaw: AlocacaoApiResponse[],
@@ -458,6 +469,47 @@ export const AlocacaoPage: React.FC = () => {
     }
   };
 
+  const handleAbrirEdicao = (aloc: AlocacaoAtiva) => {
+    setAlocacaoEditando(aloc);
+    setEditColaborador(aloc.id_colaborador);
+    setEditServico(aloc.id_servico !== null ? String(aloc.id_servico) : '');
+    setEditPrecoCusto('');
+    setEditObservacoes('');
+    setEditError('');
+    setOpenEditDialog(true);
+  };
+
+  const handleSalvarEdicao = async () => {
+    if (!alocacaoEditando) return;
+    if (!editColaborador) {
+      setEditError('Selecione um colaborador.');
+      return;
+    }
+    const precoCustoNorm = editPrecoCusto ? Number(editPrecoCusto.replace(',', '.')) : undefined;
+    if (editPrecoCusto && (!Number.isFinite(precoCustoNorm) || (precoCustoNorm as number) <= 0)) {
+      setEditError('Preço de custo inválido (deve ser maior que zero).');
+      return;
+    }
+    setEditLoading(true);
+    setEditError('');
+    try {
+      const payload: any = {
+        id_colaborador: editColaborador,
+      };
+      if (editServico) payload.id_servico_catalogo = Number(editServico);
+      if (precoCustoNorm) payload.preco_custo = precoCustoNorm;
+      if (editObservacoes.trim()) payload.observacoes = editObservacoes.trim();
+      await api.patch(`/alocacoes/${alocacaoEditando.id}`, payload);
+      setOpenEditDialog(false);
+      setAlocacaoEditando(null);
+      await carregarDados();
+    } catch (error: any) {
+      setEditError(error.response?.data?.message || 'Erro ao salvar edição.');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const handleDesalocar = async (alocacaoId: string) => {
     if (!window.confirm('Desalocar colaborador?')) return;
 
@@ -678,13 +730,24 @@ export const AlocacaoPage: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDesalocar(aloc.id)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleAbrirEdicao(aloc)}
+                        title="Editar alocação"
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDesalocar(aloc.id)}
+                        title="Remover alocação"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))
@@ -699,6 +762,79 @@ export const AlocacaoPage: React.FC = () => {
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </TableContainer>
+
+      {/* Dialog de Edição de Alocação */}
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Editar Alocação</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          {editError && (
+            <Alert severity="error" sx={{ mb: 2 }}>{editError}</Alert>
+          )}
+
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Colaborador *</InputLabel>
+            <Select
+              value={editColaborador}
+              label="Colaborador *"
+              onChange={(e) => setEditColaborador(e.target.value)}
+            >
+              {colaboradoresDisponiveis.map((colab) => (
+                <MenuItem key={colab.id} value={colab.id}>
+                  {colab.nome_completo}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Serviço</InputLabel>
+            <Select
+              value={editServico}
+              label="Serviço"
+              onChange={(e) => setEditServico(e.target.value)}
+            >
+              <MenuItem value="">Manter atual</MenuItem>
+              {servicos.map((serv) => (
+                <MenuItem key={serv.id} value={String(serv.id)}>
+                  {(serv.nome || serv.nome_servico || 'Serviço sem nome')} ({serv.unidade_medida || '-'})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            fullWidth
+            sx={{ mb: 2 }}
+            label="Preço de Custo"
+            type="number"
+            inputProps={{ step: '0.01', min: 0 }}
+            value={editPrecoCusto}
+            onChange={(e) => setEditPrecoCusto(e.target.value)}
+            placeholder="Deixe em branco para manter o valor atual"
+          />
+
+          <TextField
+            fullWidth
+            label="Observações"
+            multiline
+            rows={3}
+            value={editObservacoes}
+            onChange={(e) => setEditObservacoes(e.target.value)}
+            placeholder="Deixe em branco para manter as observações atuais"
+          />
+        </DialogContent>
+        <Divider />
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setOpenEditDialog(false)}>Cancelar</Button>
+          <Button
+            variant="contained"
+            onClick={handleSalvarEdicao}
+            disabled={editLoading}
+          >
+            {editLoading ? 'Salvando...' : 'Salvar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Dialog de Nova Alocação */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
