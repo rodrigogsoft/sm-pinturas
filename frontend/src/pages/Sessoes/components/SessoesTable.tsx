@@ -33,7 +33,7 @@ import {
 } from '@mui/material';
 import { Visibility, Person } from '@mui/icons-material';
 import { Sessao } from '../../../services/sessoes.service';
-import alocacoesService from '../../../services/alocacoes.service';
+import { alocacoesService } from '../../../services/alocacoes.service';
 
 interface AlocacaoDetalhada {
   id: string;
