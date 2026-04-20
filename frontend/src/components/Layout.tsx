@@ -348,8 +348,10 @@ export const Layout = () => {
             <Tooltip title="Baixar App Mobile (Android)">
               <IconButton
                 component="a"
-                href="/downloads/app-jb-pinturas.apk"
-                download
+                href="https://smpinturas.conecti.tec.br/sm-pinturas.apk"
+                download="sm-pinturas.apk"
+                target="_blank"
+                rel="noopener noreferrer"
                 sx={{ mr: 1, color: '#0D1B8C' }}
               >
                 <PhoneAndroid />

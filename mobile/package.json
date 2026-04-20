@@ -1,12 +1,13 @@
 {
   "name": "jbpinturas",
-  "version": "0.0.1",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "postandroid": "node scripts/sync-apk.js",
     "build:apk": "cd android && gradlew.bat app:assembleDebug && cd .. && node scripts/sync-apk.js",
     "build:apk:release": "cd android && gradlew.bat app:assembleRelease && cd .. && node scripts/sync-apk.js",
+    "build:apk:production": "set ENVFILE=../.env.production && cd android && gradlew.bat app:assembleRelease && cd .. && node scripts/sync-apk.js",
     "sync:apk": "node scripts/sync-apk.js",
     "ios": "react-native run-ios",
     "lint": "eslint .",

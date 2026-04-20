@@ -8,6 +8,9 @@ yarn-error.log*
 android/app/debug/
 android/app/release/
 android/app/google-services.json
+android/keystore.properties
+android/app/*.keystore
+android/app/*.jks
 .gradle/
 build/
 

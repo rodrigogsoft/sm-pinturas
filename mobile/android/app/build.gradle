@@ -88,8 +88,8 @@ android {
         applicationId "com.jbpinturas.financeiro"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
     signingConfigs {
         debug {
@@ -117,6 +117,14 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+    }
+}
+
+// Substitui o artefato legado react-native pelo react-android (RN 0.71+)
+// Evita duplicação de ViewManagerWithGeneratedInterface no DEX merge
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module('com.facebook.react:react-native') using module('com.facebook.react:react-android:+')
     }
 }
 
