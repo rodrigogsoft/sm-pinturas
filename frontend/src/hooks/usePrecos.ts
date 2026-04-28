@@ -80,6 +80,19 @@ export const usePrecos = (idObra?: string) => {
     }
   };
 
+  const retornarParaRascunho = async (id: string) => {
+    try {
+      setError(null);
+      const precoAtualizado = await precosService.retornarParaRascunho(id);
+      setPrecos(precos.map((p) => (p.id === id ? precoAtualizado : p)));
+      return precoAtualizado;
+    } catch (err: any) {
+      const mensagem = err.response?.data?.message || 'Erro ao retornar preço para rascunho';
+      setError(mensagem);
+      throw new Error(mensagem);
+    }
+  };
+
   const validarMargem = async (id: string): Promise<MargemValidacao | null> => {
     try {
       const validacao = await precosService.validarMargem(id);
@@ -115,6 +128,7 @@ export const usePrecos = (idObra?: string) => {
     atualizar,
     aprovar,
     submeter,
+    retornarParaRascunho,
     validarMargem,
     deletar,
   };

@@ -42,7 +42,18 @@ export const PrecosPage = () => {
   const [carregandoAuxiliar, setCarregandoAuxiliar] = useState(false);
   const [estatisticas, setEstatisticas] = useState<any>(null);
 
-  const { precos, loading, error, carregarPrecos, criar, atualizar, aprovar, submeter, deletar } =
+  const {
+    precos,
+    loading,
+    error,
+    carregarPrecos,
+    criar,
+    atualizar,
+    aprovar,
+    submeter,
+    retornarParaRascunho,
+    deletar,
+  } =
     usePrecos(filtroObra);
 
   // Carregar obras, serviços e estatísticas
@@ -113,6 +124,15 @@ export const PrecosPage = () => {
       alert('Preço não encontrado');
       return;
     }
+
+    if (
+      preco.status_aprovacao === 'PENDENTE' ||
+      preco.status_aprovacao === 'APROVADO'
+    ) {
+      alert('Só é permitido editar preços em RASCUNHO ou REJEITADO.');
+      return;
+    }
+
     setPrecoEditando(preco);
     setDialogAberto(true);
   };
@@ -132,6 +152,19 @@ export const PrecosPage = () => {
       await carregarPrecos();
     } catch (err: any) {
       alert('Erro ao submeter preço: ' + err.message);
+    }
+  };
+
+  const handleRetornarParaRascunho = async (id: string) => {
+    if (!window.confirm('Deseja realmente retornar este preço para rascunho?')) {
+      return;
+    }
+
+    try {
+      await retornarParaRascunho(id);
+      await carregarPrecos();
+    } catch (err: any) {
+      alert('Erro ao retornar preço para rascunho: ' + err.message);
     }
   };
 
@@ -441,6 +474,7 @@ export const PrecosPage = () => {
         onToggleSelecionarTodos={handleSelecionarTodosPrecos}
         onAprovar={podeAprovar ? handleAprovarPreco : undefined}
         onSubmeter={podeSubmeter ? handleSubmeterPreco : undefined}
+        onRetornarParaRascunho={podeEditar ? handleRetornarParaRascunho : undefined}
         onEditar={podeEditar ? handleEditarPreco : undefined}
         onDeletar={podeApagar ? handleDeletarPreco : undefined}
       />

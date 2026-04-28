@@ -89,6 +89,11 @@ class PrecosService {
     return response.data;
   }
 
+  async retornarParaRascunho(id: string): Promise<TabelaPreco> {
+    const response = await api.patch(`${API_URL}/${id}/retornar-rascunho`, {});
+    return response.data;
+  }
+
   async validarMargem(id: string): Promise<MargemValidacao> {
     const response = await api.get(`${API_URL}/${id}/margem`);
     return response.data;

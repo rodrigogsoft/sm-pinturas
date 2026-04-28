@@ -39,6 +39,7 @@ interface PrecosTableProps {
   onToggleSelecionarTodos?: () => void;
   onAprovar?: (id: string, status: 'APROVADO' | 'REJEITADO', obs?: string) => Promise<void>;
   onSubmeter?: (id: string) => Promise<void>;
+  onRetornarParaRascunho?: (id: string) => Promise<void>;
   onEditar?: (id: string) => void;
   onDeletar?: (id: string) => Promise<void>;
 }
@@ -57,6 +58,7 @@ const PrecosTable: React.FC<PrecosTableProps> = ({
   onToggleSelecionarTodos,
   onAprovar,
   onSubmeter,
+  onRetornarParaRascunho,
   onEditar,
   onDeletar,
 }) => {
@@ -272,7 +274,26 @@ const PrecosTable: React.FC<PrecosTableProps> = ({
                         Aprovar
                       </Button>
                     )}
-                    {preco.status_aprovacao !== 'APROVADO' && onEditar && podeEditar && (
+                    {(preco.status_aprovacao === 'PENDENTE' ||
+                      preco.status_aprovacao === 'APROVADO') &&
+                      onRetornarParaRascunho &&
+                      podeEditar && (
+                        <Tooltip title="Retorna para rascunho para permitir edição e nova submissão">
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            color="warning"
+                            onClick={() => onRetornarParaRascunho(preco.id)}
+                            sx={{ mr: 1 }}
+                          >
+                            Voltar rascunho
+                          </Button>
+                        </Tooltip>
+                      )}
+                    {(preco.status_aprovacao === 'RASCUNHO' ||
+                      preco.status_aprovacao === 'REJEITADO') &&
+                      onEditar &&
+                      podeEditar && (
                       <Button
                         size="small"
                         variant="outlined"
