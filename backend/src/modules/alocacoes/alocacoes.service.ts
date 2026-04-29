@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,6 +18,8 @@ import { StatusAprovacaoEnum, TabelaPreco } from '../precos/entities/tabela-prec
 
 @Injectable()
 export class AlocacoesService {
+  private readonly logger = new Logger(AlocacoesService.name);
+
   constructor(
     @InjectRepository(AlocacaoTarefa)
     private alocacaoRepository: Repository<AlocacaoTarefa>,
@@ -216,7 +219,17 @@ export class AlocacoesService {
       }
     }
 
-    await this.sincronizarPrecoCusto(createAlocacaoDto);
+    try {
+      await this.sincronizarPrecoCusto(createAlocacaoDto);
+    } catch (error) {
+      // A sincronização de preço é um efeito colateral.
+      // Não deve impedir a criação da alocação em caso de drift de schema/constraints.
+      this.logger.warn(
+        `Falha ao sincronizar preço de custo para alocação (sessao=${createAlocacaoDto.id_sessao}, servico=${createAlocacaoDto.id_servico_catalogo}): ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
 
     const alocacao = this.alocacaoRepository.create(createAlocacaoDto);
     const savedAlocacao = await this.alocacaoRepository.save(alocacao);
