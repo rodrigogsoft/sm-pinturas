@@ -339,6 +339,8 @@ const SessoesTable: React.FC<SessoesTableProps> = ({
         <DialogTitle>Encerrar Sessão</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <TextField
+            id="encerrar-nome-conferente"
+            name="nome_conferente"
             fullWidth
             label="Nome do conferente (obrigatório)"
             placeholder="Nome completo de quem conferiu o fechamento da OS"
@@ -349,6 +351,8 @@ const SessoesTable: React.FC<SessoesTableProps> = ({
             error={!!erroJustificativa && (!nomeConferente || nomeConferente.trim().length < 3)}
           />
           <TextField
+            id="encerrar-cpf-conferente"
+            name="cpf_conferente"
             fullWidth
             label="CPF do conferente (obrigatório)"
             placeholder="000.000.000-00"
@@ -368,6 +372,8 @@ const SessoesTable: React.FC<SessoesTableProps> = ({
             error={!!erroJustificativa && cpfConferente.replace(/\D/g, '').length !== 11}
           />
           <TextField
+            id="encerrar-justificativa"
+            name="justificativa"
             fullWidth
             label="Justificativa (obrigatória)"
             placeholder="Descreva o motivo do encerramento e detalhes relevantes"
@@ -381,6 +387,8 @@ const SessoesTable: React.FC<SessoesTableProps> = ({
             helperText={erroJustificativa || 'Mínimo 15 caracteres'}
           />
           <TextField
+            id="encerrar-observacoes"
+            name="observacoes"
             fullWidth
             label="Observações (opcional)"
             placeholder="Alguma observação sobre a sessão"

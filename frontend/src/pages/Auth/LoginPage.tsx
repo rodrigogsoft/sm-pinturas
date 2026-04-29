@@ -133,11 +133,14 @@ export const LoginPage = () => {
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} aria-label="formulario-login">
             <TextField
+              id="login-email"
+              name="email"
               fullWidth
               label="Email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               margin="normal"
@@ -146,9 +149,12 @@ export const LoginPage = () => {
               placeholder="admin@jbpinturas.com.br"
             />
             <TextField
+              id="login-password"
+              name="password"
               fullWidth
               label="Senha"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               margin="normal"
