@@ -135,16 +135,15 @@ const ItensAmbienteTable: React.FC<ItensAmbienteTableProps> = ({
                     {item.status || '—'}
                   </TableCell>
                   <TableCell>
-                    {onEditar && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => onEditar(item.id)}
-                        sx={{ mr: 1 }}
-                      >
-                        Editar
-                      </Button>
-                    )}
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => onEditar?.(item.id)}
+                      disabled={!onEditar}
+                      sx={{ mr: 1 }}
+                    >
+                      Editar
+                    </Button>
                     {onDeletar && (
                       <Button
                         size="small"
