@@ -236,17 +236,26 @@ export class AlocacoesService {
 
     // Write-through ERS 4.1: espelhar na tabela por item se id_item_ambiente informado
     if (savedAlocacao.id_item_ambiente) {
-      await this.alocacaoItemRepository.save(
-        this.alocacaoItemRepository.create({
-          id_sessao: savedAlocacao.id_sessao,
-          id_ambiente: savedAlocacao.id_ambiente,
-          id_item_ambiente: savedAlocacao.id_item_ambiente,
-          id_colaborador: savedAlocacao.id_colaborador,
-          id_alocacao_legado: savedAlocacao.id,
-          hora_inicio: savedAlocacao.hora_inicio,
-          status: StatusAlocacaoItemEnum.EM_ANDAMENTO,
-        }),
-      );
+      try {
+        await this.alocacaoItemRepository.save(
+          this.alocacaoItemRepository.create({
+            id_sessao: savedAlocacao.id_sessao,
+            id_ambiente: savedAlocacao.id_ambiente,
+            id_item_ambiente: savedAlocacao.id_item_ambiente,
+            id_colaborador: savedAlocacao.id_colaborador,
+            id_alocacao_legado: savedAlocacao.id,
+            hora_inicio: savedAlocacao.hora_inicio,
+            status: StatusAlocacaoItemEnum.EM_ANDAMENTO,
+          }),
+        );
+      } catch (error) {
+        // O espelhamento é complementar. A alocação principal já foi persistida.
+        this.logger.warn(
+          `Falha ao espelhar alocação em tb_alocacoes_itens (alocacao=${savedAlocacao.id}, item=${savedAlocacao.id_item_ambiente}): ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
     }
 
     return savedAlocacao;
