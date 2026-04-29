@@ -15,16 +15,19 @@ import {
   DialogContent,
   DialogActions,
   Chip,
+  TextField,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useLocation } from 'react-router-dom';
 import { medicoesService } from '../../services/medicoes.service';
 import { MedicoesForm } from '../../components/MedicoesForm';
-import mockService from '../../services/mock.service';
 import { api } from '../../services/api';
 import ImageIcon from '@mui/icons-material/Image';
 import InfoIcon from '@mui/icons-material/Info';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { PerfilEnum } from '../../store/slices/authSlice';
 
 interface Medicao {
   id: string;
@@ -143,6 +146,7 @@ function TabPanel(props: TabPanelProps) {
 
 export const MedicoesPage = () => {
   const location = useLocation();
+  const { user } = useSelector((state: RootState) => state.auth);
   const [tabValue, setTabValue] = useState(0);
   const [medicoes, setMedicoes] = useState<Medicao[]>([]);
   const [excedentes, setExcedentes] = useState<Medicao[]>([]);
@@ -156,6 +160,17 @@ export const MedicoesPage = () => {
     valor_total: 0,
     pendentes_pagamento: 0,
   });
+  const [medicaoEditando, setMedicaoEditando] = useState<Medicao | null>(null);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [editQtdExecutada, setEditQtdExecutada] = useState('');
+  const [editAreaPlanejada, setEditAreaPlanejada] = useState('');
+  const [editJustificativa, setEditJustificativa] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+
+  const perfilBruto = (user as any)?.id_perfil ?? (user as any)?.perfil;
+  const perfil = perfilBruto !== undefined ? Number(perfilBruto) : undefined;
+  const podeEditar = perfil === PerfilEnum.ADMIN || perfil === PerfilEnum.GESTOR;
+  const podeApagar = perfil === PerfilEnum.ADMIN;
 
   const toNumber = (value: unknown): number => {
     if (typeof value === 'number') {
@@ -250,92 +265,70 @@ export const MedicoesPage = () => {
       const paramsUrl = new URLSearchParams(location.search);
       const idSessao = paramsUrl.get('id_sessao') || undefined;
 
-      // Verificar se backend está disponível
-      const backendAvailable = await mockService.isBackendAvailable();
-      
-      let medicoesData: Medicao[] = [];
-      let excedenteData: Medicao[] = [];
-      
-      if (backendAvailable) {
-        // Usar API real + enriquecer com nome do serviço
-        const [medicoesResponse, excedenteResponse, alocacoesResponse, servicosResponse, obrasResponse] = await Promise.all([
-          medicoesService.listar({ id_sessao: idSessao }),
-          medicoesService.listarExcedentes(idSessao ? { id_sessao: idSessao } : undefined),
-          api.get('/alocacoes', { params: idSessao ? { id_sessao: idSessao } : {} }),
-          api.get('/servicos'),
-          api.get('/obras'),
-        ]);
+      const [medicoesResponse, excedenteResponse, alocacoesResponse, servicosResponse, obrasResponse] = await Promise.all([
+        medicoesService.listar({ id_sessao: idSessao }),
+        medicoesService.listarExcedentes(idSessao ? { id_sessao: idSessao } : undefined),
+        api.get('/alocacoes', { params: idSessao ? { id_sessao: idSessao } : {} }),
+        api.get('/servicos'),
+        api.get('/obras'),
+      ]);
 
-        const alocacoesRaw = (alocacoesResponse.data || []) as AlocacaoApi[];
-        const servicosRaw = (servicosResponse.data || []) as ServicoApi[];
-        const obrasRaw = (obrasResponse.data || []) as ObraApi[];
+      const alocacoesRaw = (alocacoesResponse.data || []) as AlocacaoApi[];
+      const servicosRaw = (servicosResponse.data || []) as ServicoApi[];
+      const obrasRaw = (obrasResponse.data || []) as ObraApi[];
 
-        const alocacoesMap = new Map<string, {
-          nomeServico?: string;
-          idServico?: number;
-          nomeColaborador?: string;
-          nomeAmbiente?: string;
-          idObra?: string;
-        }>(
-          alocacoesRaw.map((alocacao) => {
-            const idServico =
-              alocacao.id_servico_catalogo ??
-              alocacao.idServicoCatalogo ??
-              alocacao.id_servico ??
-              alocacao.idServico ??
-              undefined;
-            return [
-              alocacao.id,
-              {
-                nomeServico: alocacao.nome_servico || alocacao.nomeServico,
-                idServico,
-                nomeColaborador: alocacao.colaborador?.nome_completo,
-                nomeAmbiente: alocacao.ambiente?.nome,
-                idObra: alocacao.sessao?.id_obra,
-              },
-            ];
-          })
-        );
+      const alocacoesMap = new Map<string, {
+        nomeServico?: string;
+        idServico?: number;
+        nomeColaborador?: string;
+        nomeAmbiente?: string;
+        idObra?: string;
+      }>(
+        alocacoesRaw.map((alocacao) => {
+          const idServico =
+            alocacao.id_servico_catalogo ??
+            alocacao.idServicoCatalogo ??
+            alocacao.id_servico ??
+            alocacao.idServico ??
+            undefined;
+          return [
+            alocacao.id,
+            {
+              nomeServico: alocacao.nome_servico || alocacao.nomeServico,
+              idServico,
+              nomeColaborador: alocacao.colaborador?.nome_completo,
+              nomeAmbiente: alocacao.ambiente?.nome,
+              idObra: alocacao.sessao?.id_obra,
+            },
+          ];
+        })
+      );
 
-        const servicosMap = new Map<number, string>(
-          servicosRaw.map((servico) => [Number(servico.id), servico.nome])
-        );
+      const servicosMap = new Map<number, string>(
+        servicosRaw.map((servico) => [Number(servico.id), servico.nome])
+      );
 
-        const obrasMap = new Map<string, string>(
-          obrasRaw.map((obra) => [obra.id, obra.nome])
-        );
+      const obrasMap = new Map<string, string>(
+        obrasRaw.map((obra) => [obra.id, obra.nome])
+      );
 
-        medicoesData = normalizarMedicoes(
-          ((medicoesResponse.data || []) as MedicaoApi[]),
-          alocacoesMap,
-          servicosMap,
-          obrasMap,
-        );
+      const medicoesData = normalizarMedicoes(
+        ((medicoesResponse.data || []) as MedicaoApi[]),
+        alocacoesMap,
+        servicosMap,
+        obrasMap,
+      );
 
-        excedenteData = normalizarMedicoes(
-          ((excedenteResponse.data || []) as MedicaoApi[]),
-          alocacoesMap,
-          servicosMap,
-          obrasMap,
-        );
-      } else {
-        // Usar dados mock
-        medicoesData = (mockService.getMockMedicoes() as unknown as Medicao[]).map((medicao) => ({
-          ...medicao,
-          nomeServico: (medicao as any).nomeServico || 'Servico nao informado',
-        }));
-        excedenteData = (mockService.getMockMedicoesExcedentes() as unknown as Medicao[]).map((medicao) => ({
-          ...medicao,
-          nomeServico: (medicao as any).nomeServico || 'Servico nao informado',
-        }));
-        // Mostrar aviso ao usuário
-        setError('Backend não disponível. Exibindo dados de demonstração.');
-      }
+      const excedenteData = normalizarMedicoes(
+        ((excedenteResponse.data || []) as MedicaoApi[]),
+        alocacoesMap,
+        servicosMap,
+        obrasMap,
+      );
       
       setMedicoes(medicoesData);
       setExcedentes(excedenteData);
 
-      // Calcular estatísticas com dados reais (ou fallback, se backend indisponível)
       const stats = {
         total_medicoes: medicoesData.length,
         total_excedentes: excedenteData.length,
@@ -350,32 +343,85 @@ export const MedicoesPage = () => {
       });
     } catch (err: any) {
       console.error('Erro ao carregar medicões:', err);
-      // Fallback para mock em caso de erro
-      const medicoesData = (mockService.getMockMedicoes() as unknown as Medicao[]).map((medicao) => ({
-        ...medicao,
-        nomeServico: (medicao as any).nomeServico || 'Servico nao informado',
-      }));
-      const excedenteData = (mockService.getMockMedicoesExcedentes() as unknown as Medicao[]).map((medicao) => ({
-        ...medicao,
-        nomeServico: (medicao as any).nomeServico || 'Servico nao informado',
-      }));
-      setMedicoes(medicoesData);
-      setExcedentes(excedenteData);
-      const stats = {
-        total_medicoes: medicoesData.length,
-        total_excedentes: excedenteData.length,
-        valor_total: medicoesData.reduce((acc, medicao) => acc + toNumber(medicao.valor_total), 0),
-        pendentes_pagamento: medicoesData.filter((medicao) => medicao.status_pagamento !== 'PAGO').length,
-      };
+      setMedicoes([]);
+      setExcedentes([]);
       setStats({
-        total_medicoes: stats.total_medicoes,
-        total_excedentes: stats.total_excedentes,
-        valor_total: stats.valor_total,
-        pendentes_pagamento: stats.pendentes_pagamento,
+        total_medicoes: 0,
+        total_excedentes: 0,
+        valor_total: 0,
+        pendentes_pagamento: 0,
       });
-      setError('Modo demonstração: exibindo dados de exemplo.');
+      const mensagem = err?.response?.data?.message || err?.message || 'Erro ao carregar medições do backend.';
+      setError(Array.isArray(mensagem) ? mensagem.join(' | ') : mensagem);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAbrirEdicao = (medicao: Medicao) => {
+    setMedicaoEditando(medicao);
+    setEditQtdExecutada(String(toNumber(medicao.qtd_executada)));
+    setEditAreaPlanejada(String(toNumber(medicao.area_planejada)));
+    setEditJustificativa(medicao.justificativa || '');
+    setOpenEditModal(true);
+  };
+
+  const handleFecharEdicao = () => {
+    setOpenEditModal(false);
+    setMedicaoEditando(null);
+    setEditQtdExecutada('');
+    setEditAreaPlanejada('');
+    setEditJustificativa('');
+  };
+
+  const handleSalvarEdicao = async () => {
+    if (!medicaoEditando) {
+      return;
+    }
+
+    const qtd = Number(editQtdExecutada.replace(',', '.'));
+    const area = Number(editAreaPlanejada.replace(',', '.'));
+
+    if (!Number.isFinite(qtd) || qtd <= 0) {
+      setError('Quantidade executada deve ser maior que zero.');
+      return;
+    }
+
+    if (!Number.isFinite(area) || area <= 0) {
+      setError('Área planejada deve ser maior que zero.');
+      return;
+    }
+
+    try {
+      setEditLoading(true);
+      setError('');
+      await medicoesService.atualizar(medicaoEditando.id, {
+        qtd_executada: qtd,
+        area_planejada: area,
+        justificativa: editJustificativa || undefined,
+      });
+      handleFecharEdicao();
+      await carregarDados();
+    } catch (err: any) {
+      const mensagem = err?.response?.data?.message || err?.message || 'Erro ao editar medição.';
+      setError(Array.isArray(mensagem) ? mensagem.join(' | ') : mensagem);
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleApagar = async (medicao: Medicao) => {
+    if (!window.confirm('Tem certeza que deseja apagar esta medição?')) {
+      return;
+    }
+
+    try {
+      setError('');
+      await medicoesService.deletar(medicao.id);
+      await carregarDados();
+    } catch (err: any) {
+      const mensagem = err?.response?.data?.message || err?.message || 'Erro ao apagar medição.';
+      setError(Array.isArray(mensagem) ? mensagem.join(' | ') : mensagem);
     }
   };
 
@@ -467,6 +513,47 @@ export const MedicoesPage = () => {
         />
       ),
     },
+    ...(podeEditar || podeApagar
+      ? [
+          {
+            field: 'acoes',
+            headerName: 'Ações',
+            width: 210,
+            sortable: false,
+            filterable: false,
+            renderCell: (params: any) => {
+              const medicao = params.row as Medicao;
+              const bloqueada = medicao.status_pagamento === 'PAGO';
+
+              return (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  {podeEditar && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => handleAbrirEdicao(medicao)}
+                      disabled={bloqueada}
+                    >
+                      Editar
+                    </Button>
+                  )}
+                  {podeApagar && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      onClick={() => handleApagar(medicao)}
+                      disabled={bloqueada}
+                    >
+                      Apagar
+                    </Button>
+                  )}
+                </Box>
+              );
+            },
+          } as GridColDef,
+        ]
+      : []),
   ];
 
   const columnasExcedentes: GridColDef[] = [
@@ -712,6 +799,44 @@ export const MedicoesPage = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal}>Fechar</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openEditModal} onClose={handleFecharEdicao} maxWidth="sm" fullWidth>
+        <DialogTitle>Editar Medição</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              label="Qtd. Executada (m²)"
+              value={editQtdExecutada}
+              onChange={(e) => setEditQtdExecutada(e.target.value)}
+              type="number"
+              inputProps={{ min: 0, step: '0.01' }}
+              fullWidth
+            />
+            <TextField
+              label="Área Planejada (m²)"
+              value={editAreaPlanejada}
+              onChange={(e) => setEditAreaPlanejada(e.target.value)}
+              type="number"
+              inputProps={{ min: 0, step: '0.01' }}
+              fullWidth
+            />
+            <TextField
+              label="Justificativa"
+              value={editJustificativa}
+              onChange={(e) => setEditJustificativa(e.target.value)}
+              multiline
+              minRows={3}
+              fullWidth
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleFecharEdicao} disabled={editLoading}>Cancelar</Button>
+          <Button onClick={handleSalvarEdicao} variant="contained" disabled={editLoading}>
+            Salvar
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
