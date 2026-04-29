@@ -41,6 +41,7 @@ export interface ResultadoLote {
 }
 
 export interface UpdateItemAmbienteDto {
+  nome_elemento?: string;
   area_planejada?: number;
 }
 

@@ -18,7 +18,11 @@ import CadastroLoteDialog from './components/CadastroLoteDialog';
 import ambientesService from '../../services/ambientes.service';
 import obrasService from '../../services/obras.service';
 import pavimentosService from '../../services/pavimentos.service';
-import itensAmbienteService, { ItemLoteDto } from '../../services/itens-ambiente.service';
+import itensAmbienteService, {
+  ItemAmbiente,
+  ItemLoteDto,
+  UpdateItemAmbienteDto,
+} from '../../services/itens-ambiente.service';
 
 const normalizarNomeAmbiente = (nome: string) =>
   nome
@@ -37,6 +41,7 @@ export const ItensAmbientePage = () => {
   const [dialogAberto, setDialogAberto] = useState(false);
   const [dialogLoteAberto, setDialogLoteAberto] = useState(false);
   const [itensSelecionados, setItensSelecionados] = useState<string[]>([]);
+  const [itemEditando, setItemEditando] = useState<ItemAmbiente | null>(null);
   
   // Filtros
   const [filtroObra, setFiltroObra] = useState('');
@@ -59,7 +64,7 @@ export const ItensAmbientePage = () => {
     filtros.idObra = filtroObra;
   }
 
-  const { itens, loading, error, carregarItens, criar, deletar } =
+  const { itens, loading, error, carregarItens, criar, atualizar, deletar } =
     useItensAmbiente(filtros);
 
   // Carregar obtém e dados auxiliares
@@ -113,14 +118,31 @@ export const ItensAmbientePage = () => {
     );
   }, [itens]);
 
-  const handleCriarItem = async (dados: any) => {
+  const handleSalvarItem = async (dados: any) => {
     try {
-      await criar(dados);
+      if (itemEditando) {
+        await atualizar(itemEditando.id, dados as UpdateItemAmbienteDto);
+      } else {
+        await criar(dados);
+      }
       setDialogAberto(false);
+      setItemEditando(null);
       await carregarItens();
     } catch (err: any) {
-      alert('Erro ao criar item: ' + err.message);
+      const acao = itemEditando ? 'atualizar' : 'criar';
+      alert(`Erro ao ${acao} item: ` + err.message);
     }
+  };
+
+  const handleEditarItem = (id: string) => {
+    const item = itens.find((it) => String(it.id) === String(id));
+    if (!item) {
+      alert('Item não encontrado para edição.');
+      return;
+    }
+
+    setItemEditando(item);
+    setDialogAberto(true);
   };
 
   const handleCriarLote = async (itens: ItemLoteDto[], cadastrarSemelhantes: boolean) => {
@@ -284,7 +306,10 @@ export const ItensAmbientePage = () => {
           <Button
             variant="contained"
             color="success"
-            onClick={() => setDialogAberto(true)}
+            onClick={() => {
+              setItemEditando(null);
+              setDialogAberto(true);
+            }}
             disabled={carregandoAuxiliar}
           >
             + Novo Item
@@ -321,16 +346,22 @@ export const ItensAmbientePage = () => {
         selectedIds={itensSelecionados}
         onToggleSelecionado={handleSelecionarItem}
         onToggleSelecionarTodos={handleSelecionarTodosItens}
+        onEditar={handleEditarItem}
         onDeletar={handleDeletarItem}
       />
 
       {/* Dialog de Criação Individual */}
       <ItemAmbienteForm
         open={dialogAberto}
-        onClose={() => setDialogAberto(false)}
-        onSubmit={handleCriarItem}
+        onClose={() => {
+          setDialogAberto(false);
+          setItemEditando(null);
+        }}
+        onSubmit={handleSalvarItem}
         ambientes={ambientes}
         idAmbientePreSelecionado={filtroAmbiente}
+        modo={itemEditando ? 'editar' : 'criar'}
+        itemInicial={itemEditando}
       />
 
       {/* Dialog de Cadastro em Lote (RF21) */}

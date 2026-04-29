@@ -12,14 +12,20 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { CreateItemAmbienteDto } from '../../../services/itens-ambiente.service';
+import {
+  CreateItemAmbienteDto,
+  ItemAmbiente,
+  UpdateItemAmbienteDto,
+} from '../../../services/itens-ambiente.service';
 
 interface ItemAmbienteFormProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (dados: CreateItemAmbienteDto) => Promise<void>;
+  onSubmit: (dados: CreateItemAmbienteDto | UpdateItemAmbienteDto) => Promise<void>;
   ambientes: any[];
   idAmbientePreSelecionado?: string;
+  modo?: 'criar' | 'editar';
+  itemInicial?: ItemAmbiente | null;
 }
 
 const ItemAmbienteForm: React.FC<ItemAmbienteFormProps> = ({
@@ -28,6 +34,8 @@ const ItemAmbienteForm: React.FC<ItemAmbienteFormProps> = ({
   onSubmit,
   ambientes,
   idAmbientePreSelecionado,
+  modo = 'criar',
+  itemInicial,
 }) => {
   const [formData, setFormData] = useState<CreateItemAmbienteDto>({
     id_ambiente: idAmbientePreSelecionado || '',
@@ -39,13 +47,21 @@ const ItemAmbienteForm: React.FC<ItemAmbienteFormProps> = ({
 
   useEffect(() => {
     if (open) {
-      setFormData({
-        id_ambiente: idAmbientePreSelecionado || '',
-        nome_elemento: '',
-        area_planejada: 0,
-      });
+      if (modo === 'editar' && itemInicial) {
+        setFormData({
+          id_ambiente: itemInicial.id_ambiente,
+          nome_elemento: (itemInicial.nome_elemento || '').trim(),
+          area_planejada: Number(itemInicial.area_planejada || 0),
+        });
+      } else {
+        setFormData({
+          id_ambiente: idAmbientePreSelecionado || '',
+          nome_elemento: '',
+          area_planejada: 0,
+        });
+      }
     }
-  }, [open, idAmbientePreSelecionado]);
+  }, [open, idAmbientePreSelecionado, itemInicial, modo]);
 
   const handleSubmit = async () => {
     if (!formData.id_ambiente) {
@@ -65,7 +81,14 @@ const ItemAmbienteForm: React.FC<ItemAmbienteFormProps> = ({
 
     try {
       setProcessando(true);
-      await onSubmit(formData);
+      if (modo === 'editar') {
+        await onSubmit({
+          nome_elemento: formData.nome_elemento?.trim(),
+          area_planejada: formData.area_planejada,
+        });
+      } else {
+        await onSubmit(formData);
+      }
       onClose();
     } catch (err: any) {
       console.error('Erro ao salvar item:', err);
@@ -76,9 +99,11 @@ const ItemAmbienteForm: React.FC<ItemAmbienteFormProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Novo Elemento de Serviço</DialogTitle>
+      <DialogTitle>
+        {modo === 'editar' ? 'Editar Elemento de Serviço' : 'Novo Elemento de Serviço'}
+      </DialogTitle>
       <DialogContent sx={{ pt: 2 }}>
-        <FormControl fullWidth margin="normal" disabled={!!idAmbientePreSelecionado}>
+        <FormControl fullWidth margin="normal" disabled={!!idAmbientePreSelecionado || modo === 'editar'}>
           <InputLabel>Ambiente</InputLabel>
           <Select
             value={formData.id_ambiente}
@@ -125,7 +150,7 @@ const ItemAmbienteForm: React.FC<ItemAmbienteFormProps> = ({
           disabled={processando}
           color="primary"
         >
-          {processando ? <CircularProgress size={24} /> : 'Salvar'}
+          {processando ? <CircularProgress size={24} /> : modo === 'editar' ? 'Atualizar' : 'Salvar'}
         </Button>
       </DialogActions>
     </Dialog>
