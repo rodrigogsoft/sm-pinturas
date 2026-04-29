@@ -16,6 +16,7 @@ import {
   DialogActions,
   Chip,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
@@ -513,47 +514,62 @@ export const MedicoesPage = () => {
         />
       ),
     },
-    ...(podeEditar || podeApagar
-      ? [
-          {
-            field: 'acoes',
-            headerName: 'Ações',
-            width: 210,
-            sortable: false,
-            filterable: false,
-            renderCell: (params: any) => {
-              const medicao = params.row as Medicao;
-              const bloqueada = medicao.status_pagamento === 'PAGO';
+    {
+      field: 'acoes',
+      headerName: 'Ações',
+      width: 220,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: any) => {
+        const medicao = params.row as Medicao;
+        const bloqueada = medicao.status_pagamento === 'PAGO';
+        const editarDesabilitado = !podeEditar || bloqueada;
+        const apagarDesabilitado = !podeApagar || bloqueada;
 
-              return (
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  {podeEditar && (
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => handleAbrirEdicao(medicao)}
-                      disabled={bloqueada}
-                    >
-                      Editar
-                    </Button>
-                  )}
-                  {podeApagar && (
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleApagar(medicao)}
-                      disabled={bloqueada}
-                    >
-                      Apagar
-                    </Button>
-                  )}
-                </Box>
-              );
-            },
-          } as GridColDef,
-        ]
-      : []),
+        const tooltipEditar = !podeEditar
+          ? 'Sem permissão para editar'
+          : bloqueada
+            ? 'Medição paga não pode ser editada'
+            : 'Editar medição';
+
+        const tooltipApagar = !podeApagar
+          ? 'Sem permissão para apagar'
+          : bloqueada
+            ? 'Medição paga não pode ser apagada'
+            : 'Apagar medição';
+
+        return (
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Tooltip title={tooltipEditar}>
+              <span>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleAbrirEdicao(medicao)}
+                  disabled={editarDesabilitado}
+                >
+                  Editar
+                </Button>
+              </span>
+            </Tooltip>
+
+            <Tooltip title={tooltipApagar}>
+              <span>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="error"
+                  onClick={() => handleApagar(medicao)}
+                  disabled={apagarDesabilitado}
+                >
+                  Apagar
+                </Button>
+              </span>
+            </Tooltip>
+          </Box>
+        );
+      },
+    },
   ];
 
   const columnasExcedentes: GridColDef[] = [
