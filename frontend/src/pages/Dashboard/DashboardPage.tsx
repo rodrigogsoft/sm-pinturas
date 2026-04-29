@@ -563,6 +563,7 @@ export const DashboardPage = () => {
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mountedRef = useRef(true);
   const drillCacheRef = useRef<DrilldownCache>({});
+  const dashboardFinanceiroForbiddenRef = useRef(false);
 
   const { user } = useSelector((state: RootState) => state.auth);
   const mostraFin = useMemo(
@@ -650,16 +651,30 @@ export const DashboardPage = () => {
       return;
     }
 
+    if (dashboardFinanceiroForbiddenRef.current) {
+      return;
+    }
+
     try {
       const res = await relatoriosAPI.getDashboardFinanceiro({ periodo });
       if (mountedRef.current) {
         setFinanceiro(res.data);
       }
-    } catch {
+    } catch (err: any) {
+      const status = err?.status ?? err?.response?.status;
+      if (status === 403) {
+        // Não insiste em polling quando o backend nega acesso para este usuário/contexto.
+        dashboardFinanceiroForbiddenRef.current = true;
+      }
       if (mountedRef.current) {
         setFinanceiro(null);
       }
     }
+  }, [idPerfil, periodo]);
+
+  useEffect(() => {
+    // Permite nova tentativa ao trocar perfil/período.
+    dashboardFinanceiroForbiddenRef.current = false;
   }, [idPerfil, periodo]);
 
   const carregarDashboard = useCallback(async (mostrarLoading = false, forceExpandedDrill = false) => {

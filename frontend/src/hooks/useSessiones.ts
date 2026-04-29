@@ -6,6 +6,7 @@ export const useSessiones = (filtros?: any) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const filtrosRef = useRef<any>(filtros);
+  const bloqueadoPorPermissaoRef = useRef(false);
 
   useEffect(() => {
     filtrosRef.current = filtros;
@@ -24,12 +25,21 @@ export const useSessiones = (filtros?: any) => {
   }, [filtros]);
 
   const carregarSessoes = useCallback(async () => {
+    if (bloqueadoPorPermissaoRef.current) {
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
       const dados = await sessoesService.listar(filtrosRef.current);
       setSessoes(dados);
     } catch (err: any) {
+      const status = err?.status ?? err?.response?.status;
+      if (status === 403) {
+        // Evita repetir chamadas quando o backend já negou acesso para este contexto.
+        bloqueadoPorPermissaoRef.current = true;
+      }
       setError(err?.response?.data?.message || err?.message || 'Erro ao carregar sessões');
     } finally {
       setLoading(false);
@@ -97,6 +107,8 @@ export const useSessiones = (filtros?: any) => {
   };
 
   useEffect(() => {
+    // Ao mudar filtros, libera uma nova tentativa de carregamento.
+    bloqueadoPorPermissaoRef.current = false;
     void carregarSessoes();
   }, [carregarSessoes, filtrosKey]);
 
