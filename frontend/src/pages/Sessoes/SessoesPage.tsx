@@ -49,6 +49,11 @@ export const SessoesPage = () => {
   const [filtroStatus, setFiltroStatus] = useState<'ABERTA' | 'ENCERRADA' | ''>('');
   const [filtroObra, setFiltroObra] = useState<string>('');
 
+  const filtrosKey = useMemo(
+    () => `${filtroStatus || 'ALL_STATUS'}|${filtroObra || 'ALL_OBRAS'}`,
+    [filtroStatus, filtroObra],
+  );
+
   const filtros = useMemo(
     () =>
       filtroStatus || filtroObra
@@ -68,7 +73,7 @@ export const SessoesPage = () => {
     criarSessao,
     encerrarSessao,
     deletarSessao,
-  } = useSessiones(filtros);
+  } = useSessiones(filtros, filtrosKey);
 
   // Carregar obras ativas
   useEffect(() => {

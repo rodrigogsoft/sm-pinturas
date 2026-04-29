@@ -37,10 +37,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
       try {
         setRestoringUser(true);
+        setApiAuthToken(storedToken);
         const response = await authAPI.getProfile();
         const userFromApi = response.data || {};
         const idPerfil = Number(userFromApi.id_perfil ?? userFromApi.perfil);
-        setApiAuthToken(storedToken);
         dispatch(
           setUser({
             user: {

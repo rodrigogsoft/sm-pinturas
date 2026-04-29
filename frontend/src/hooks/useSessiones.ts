@@ -1,11 +1,19 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import sessoesService, { Sessao, CreateSessaoDto, EncerrarSessaoDto } from '../services/sessoes.service';
 
-export const useSessiones = (filtros?: any) => {
+type FiltrosSessao = {
+  id_encarregado?: string;
+  id_obra?: string;
+  data_inicio?: string;
+  data_fim?: string;
+  status?: string;
+};
+
+export const useSessiones = (filtros?: FiltrosSessao, filtrosKeyExterna?: string) => {
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const filtrosRef = useRef<any>(filtros);
+  const filtrosRef = useRef<FiltrosSessao | undefined>(filtros);
   const bloqueadoPorPermissaoRef = useRef(false);
   const requisicaoAtivaRef = useRef(false);
   const ultimaChaveCarregadaRef = useRef<string | null>(null);
@@ -15,7 +23,7 @@ export const useSessiones = (filtros?: any) => {
   }, [filtros]);
 
   // Evita recarregamentos em cascata quando o objeto de filtros muda apenas por referência.
-  const filtrosKey = useMemo(() => {
+  const filtrosKeyInterna = useMemo(() => {
     const filtrosAtuais = filtros ?? {};
     return JSON.stringify({
       id_encarregado: filtrosAtuais.id_encarregado ?? null,
@@ -26,12 +34,14 @@ export const useSessiones = (filtros?: any) => {
     });
   }, [filtros]);
 
+  const filtrosKey = filtrosKeyExterna ?? filtrosKeyInterna;
+
   const carregarSessoes = useCallback(async (force = false) => {
     if (bloqueadoPorPermissaoRef.current) {
       return;
     }
 
-    const filtrosAtuais = filtrosRef.current ?? {};
+    const filtrosAtuais: FiltrosSessao = filtrosRef.current ?? {};
     const chaveAtual = JSON.stringify({
       id_encarregado: filtrosAtuais.id_encarregado ?? null,
       id_obra: filtrosAtuais.id_obra ?? null,
