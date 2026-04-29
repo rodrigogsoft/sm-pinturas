@@ -26,6 +26,7 @@ export interface Notificacao {
   prioridade: PrioridadeEnum;
   lida: boolean;
   created_at: string;
+  data_envio?: string;
   dados_extras?: any;
 }
 

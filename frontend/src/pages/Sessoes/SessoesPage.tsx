@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -49,6 +49,17 @@ export const SessoesPage = () => {
   const [filtroStatus, setFiltroStatus] = useState<'ABERTA' | 'ENCERRADA' | ''>('');
   const [filtroObra, setFiltroObra] = useState<string>('');
 
+  const filtros = useMemo(
+    () =>
+      filtroStatus || filtroObra
+        ? {
+            ...(filtroStatus && { status: filtroStatus }),
+            ...(filtroObra && { id_obra: filtroObra }),
+          }
+        : undefined,
+    [filtroStatus, filtroObra]
+  );
+
   const {
     sessoes,
     loading,
@@ -57,12 +68,7 @@ export const SessoesPage = () => {
     criarSessao,
     encerrarSessao,
     deletarSessao,
-  } = useSessiones(
-    filtroStatus || filtroObra ? {
-      ...(filtroStatus && { status: filtroStatus }),
-      ...(filtroObra && { id_obra: filtroObra }),
-    } : undefined
-  );
+  } = useSessiones(filtros);
 
   // Carregar obras ativas
   useEffect(() => {

@@ -98,6 +98,11 @@ export const HomeScreen = ({ navigation }: any) => {
     return cores[prioridade] || '#666';
   };
 
+  const getDataNotificacao = (notif: Notificacao): Date => {
+    const data = notif.created_at || notif.data_envio;
+    return data ? new Date(data) : new Date();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -282,7 +287,7 @@ export const HomeScreen = ({ navigation }: any) => {
                         <Paragraph style={styles.notifTitle}>{notif.titulo}</Paragraph>
                         <Paragraph style={styles.notifText}>{notif.mensagem}</Paragraph>
                         <Paragraph style={styles.notifData}>
-                          {formatTempoRelativo(new Date(notif.data_envio))}
+                          {formatTempoRelativo(getDataNotificacao(notif))}
                         </Paragraph>
                       </View>
                     </View>

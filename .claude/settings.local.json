@@ -6,7 +6,13 @@
       "Bash(grep -E \"\\\\.tsx$\")",
       "Bash(grep -c @Entity /c/Users/kbca_/develop/jb_pinturas/backend/src/modules/**/*.entity.ts)",
       "Bash(find /c/Users/kbca_/develop/jb_pinturas/backend/src/modules -name *.entity.ts -exec grep -l @Entity {})",
-      "Bash(find /c/Users/kbca_/develop/jb_pinturas/backend/src -name *finalizacao* -o -name *assinatura* -o -name *os*)"
+      "Bash(find /c/Users/kbca_/develop/jb_pinturas/backend/src -name *finalizacao* -o -name *assinatura* -o -name *os*)",
+      "Bash(pip install *)",
+      "Bash(python -c \"from fpdf import FPDF; print\\('fpdf2 instalado com sucesso'\\)\")",
+      "Bash(python gerar_descricao_pdf.py)",
+      "Read(//c/Windows/Fonts//**)",
+      "Bash(python gerar_manual_pdf.py)",
+      "Bash(python gerar_manuais_sm.py)"
     ]
   }
 }
