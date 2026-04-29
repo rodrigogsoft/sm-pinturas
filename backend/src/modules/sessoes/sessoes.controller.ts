@@ -44,7 +44,7 @@ export class SessoesController {
   }
 
   @Get()
-  @Roles(PerfilEnum.ADMIN, PerfilEnum.GESTOR, PerfilEnum.ENCARREGADO)
+  @Roles(PerfilEnum.ADMIN, PerfilEnum.GESTOR, PerfilEnum.FINANCEIRO, PerfilEnum.ENCARREGADO)
   @ApiOperation({ 
     summary: 'Listar sessões',
     description: 'Lista todas as sessões com filtros opcionais'
@@ -85,7 +85,7 @@ export class SessoesController {
   }
 
   @Get(':id')
-  @Roles(PerfilEnum.ADMIN, PerfilEnum.GESTOR, PerfilEnum.ENCARREGADO)
+  @Roles(PerfilEnum.ADMIN, PerfilEnum.GESTOR, PerfilEnum.FINANCEIRO, PerfilEnum.ENCARREGADO)
   @ApiOperation({ summary: 'Buscar sessão por ID' })
   @ApiResponse({ status: 200, description: 'Sessão encontrada' })
   @ApiResponse({ status: 404, description: 'Sessão não encontrada' })
@@ -94,7 +94,7 @@ export class SessoesController {
   }
 
   @Get(':id/duracao')
-  @Roles(PerfilEnum.ADMIN, PerfilEnum.GESTOR, PerfilEnum.ENCARREGADO)
+  @Roles(PerfilEnum.ADMIN, PerfilEnum.GESTOR, PerfilEnum.FINANCEIRO, PerfilEnum.ENCARREGADO)
   @ApiOperation({ 
     summary: 'Calcular duração da sessão',
     description: 'Retorna a duração da sessão em horas (apenas para sessões encerradas)'

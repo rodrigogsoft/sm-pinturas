@@ -1,30 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import sessoesService, { Sessao, CreateSessaoDto, EncerrarSessaoDto } from '../services/sessoes.service';
 
 export const useSessiones = (filtros?: any) => {
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const filtrosRef = useRef<any>(filtros);
 
-  const carregarSessoes = async () => {
+  useEffect(() => {
+    filtrosRef.current = filtros;
+  }, [filtros]);
+
+  // Evita recarregamentos em cascata quando o objeto de filtros muda apenas por referência.
+  const filtrosKey = useMemo(() => {
+    const filtrosAtuais = filtros ?? {};
+    return JSON.stringify({
+      id_encarregado: filtrosAtuais.id_encarregado ?? null,
+      id_obra: filtrosAtuais.id_obra ?? null,
+      data_inicio: filtrosAtuais.data_inicio ?? null,
+      data_fim: filtrosAtuais.data_fim ?? null,
+      status: filtrosAtuais.status ?? null,
+    });
+  }, [filtros]);
+
+  const carregarSessoes = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const dados = await sessoesService.listar(filtros);
+      const dados = await sessoesService.listar(filtrosRef.current);
       setSessoes(dados);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao carregar sessões');
+      setError(err?.response?.data?.message || err?.message || 'Erro ao carregar sessões');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const buscarSessaoAberta = async (id_encarregado: string) => {
     try {
       const sessao = await sessoesService.buscarSessaoAberta(id_encarregado);
       return sessao;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao buscar sessão aberta');
+      setError(err?.response?.data?.message || err?.message || 'Erro ao buscar sessão aberta');
       return null;
     }
   };
@@ -36,7 +53,7 @@ export const useSessiones = (filtros?: any) => {
       setSessoes([...sessoes, novaSessao]);
       return novaSessao;
     } catch (err: any) {
-      const mensagem = err.response?.data?.message || 'Erro ao criar sessão';
+      const mensagem = err?.response?.data?.message || err?.message || 'Erro ao criar sessão';
       setError(mensagem);
       throw new Error(mensagem);
     }
@@ -51,7 +68,7 @@ export const useSessiones = (filtros?: any) => {
       );
       return sessaoAtualizada;
     } catch (err: any) {
-      const mensagem = err.response?.data?.message || 'Erro ao encerrar sessão';
+      const mensagem = err?.response?.data?.message || err?.message || 'Erro ao encerrar sessão';
       setError(mensagem);
       throw new Error(mensagem);
     }
@@ -62,7 +79,7 @@ export const useSessiones = (filtros?: any) => {
       const resultado = await sessoesService.calcularDuracao(id);
       return resultado.duracao_horas;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao calcular duração');
+      setError(err?.response?.data?.message || err?.message || 'Erro ao calcular duração');
       return null;
     }
   };
@@ -73,15 +90,15 @@ export const useSessiones = (filtros?: any) => {
       await sessoesService.deletar(id);
       setSessoes(sessoes.filter((s) => s.id !== id));
     } catch (err: any) {
-      const mensagem = err.response?.data?.message || 'Erro ao deletar sessão';
+      const mensagem = err?.response?.data?.message || err?.message || 'Erro ao deletar sessão';
       setError(mensagem);
       throw new Error(mensagem);
     }
   };
 
   useEffect(() => {
-    carregarSessoes();
-  }, [filtros]);
+    void carregarSessoes();
+  }, [carregarSessoes, filtrosKey]);
 
   return {
     sessoes,
