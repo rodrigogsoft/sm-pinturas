@@ -67,8 +67,9 @@ export const useSessiones = (filtros?: FiltrosSessao, filtrosKeyExterna?: string
       ultimaChaveCarregadaRef.current = chaveAtual;
     } catch (err: any) {
       const status = err?.status ?? err?.response?.status;
-      if (status === 403) {
+      if (status === 401 || status === 403) {
         // Evita repetir chamadas quando o backend já negou acesso para este contexto.
+        // 401 costuma indicar token inválido/expirado; 403 indica falta de permissão.
         bloqueadoPorPermissaoRef.current = true;
         ultimaChaveCarregadaRef.current = chaveAtual;
       }
