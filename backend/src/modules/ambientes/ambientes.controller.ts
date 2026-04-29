@@ -108,7 +108,7 @@ export class AmbientesController {
   }
 
   @Patch(':id')
-  @Roles(PerfilEnum.GESTOR, PerfilEnum.ADMIN)
+  @Roles(PerfilEnum.ENCARREGADO, PerfilEnum.GESTOR, PerfilEnum.ADMIN)
   @ApiOperation({ summary: 'Atualizar ambiente' })
   @ApiResponse({ status: 200, description: 'Ambiente atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Ambiente não encontrado' })
@@ -120,7 +120,7 @@ export class AmbientesController {
   }
 
   @Delete(':id')
-  @Roles(PerfilEnum.ADMIN)
+  @Roles(PerfilEnum.ENCARREGADO, PerfilEnum.GESTOR, PerfilEnum.ADMIN)
   @ApiOperation({ summary: 'Deletar ambiente (soft delete)' })
   @ApiResponse({ status: 200, description: 'Ambiente deletado com sucesso' })
   @ApiResponse({ status: 404, description: 'Ambiente não encontrado' })

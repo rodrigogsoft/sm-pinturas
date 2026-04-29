@@ -114,7 +114,12 @@ export class ServicosController {
   }
 
   @Patch(':id')
-  @Roles(PerfilEnum.FINANCEIRO, PerfilEnum.GESTOR, PerfilEnum.ADMIN)
+  @Roles(
+    PerfilEnum.ENCARREGADO,
+    PerfilEnum.FINANCEIRO,
+    PerfilEnum.GESTOR,
+    PerfilEnum.ADMIN,
+  )
   @ApiOperation({ summary: 'Atualizar serviço' })
   @ApiResponse({ status: 200, description: 'Serviço atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Serviço não encontrado' })
@@ -126,7 +131,7 @@ export class ServicosController {
   }
 
   @Delete(':id')
-  @Roles(PerfilEnum.ADMIN)
+  @Roles(PerfilEnum.ENCARREGADO, PerfilEnum.GESTOR, PerfilEnum.ADMIN)
   @ApiOperation({ summary: 'Deletar serviço (soft delete)' })
   @ApiResponse({ status: 200, description: 'Serviço deletado com sucesso' })
   @ApiResponse({ status: 404, description: 'Serviço não encontrado' })

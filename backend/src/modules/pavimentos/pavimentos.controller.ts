@@ -93,7 +93,7 @@ export class PavimentosController {
   }
 
   @Patch(':id')
-  @Roles(PerfilEnum.GESTOR, PerfilEnum.ADMIN)
+  @Roles(PerfilEnum.ENCARREGADO, PerfilEnum.GESTOR, PerfilEnum.ADMIN)
   @ApiOperation({ summary: 'Atualizar pavimento' })
   @ApiResponse({ status: 200, description: 'Pavimento atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Pavimento não encontrado' })
@@ -105,7 +105,7 @@ export class PavimentosController {
   }
 
   @Delete(':id')
-  @Roles(PerfilEnum.ADMIN)
+  @Roles(PerfilEnum.ENCARREGADO, PerfilEnum.GESTOR, PerfilEnum.ADMIN)
   @ApiOperation({ summary: 'Deletar pavimento (soft delete)' })
   @ApiResponse({
     status: 200,
