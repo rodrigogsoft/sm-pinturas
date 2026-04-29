@@ -13,6 +13,9 @@ lerna-debug.log*
 .env.development
 .env.test
 .env.production
+backend/.env
+backend/.env.*
+!backend/.env.example
 
 # Build
 dist/
@@ -37,6 +40,10 @@ coverage/
 # Logs
 logs/
 *.log
+backend/*logs*.txt
+backend/*output*.txt
+backend/build.log
+backend/test-output.txt
 
 # Sistema Operacional
 Thumbs.db
@@ -115,10 +122,12 @@ temp/
 *.p12
 *.cert
 backend/config/firebase-service-account.json
+backend/firebase-service-account.json
 
 # Uploads
 uploads/
 storage/
+backend/uploads/
 
 # Cache
 .cache/
