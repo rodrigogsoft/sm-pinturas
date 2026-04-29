@@ -33,7 +33,12 @@ export class ServicosController {
   constructor(private readonly servicosService: ServicosService) {}
 
   @Post()
-  @Roles(PerfilEnum.FINANCEIRO, PerfilEnum.GESTOR, PerfilEnum.ADMIN)
+  @Roles(
+    PerfilEnum.ENCARREGADO,
+    PerfilEnum.FINANCEIRO,
+    PerfilEnum.GESTOR,
+    PerfilEnum.ADMIN,
+  )
   @ApiOperation({ summary: 'Criar novo serviço no catálogo' })
   @ApiResponse({ status: 201, description: 'Serviço criado com sucesso' })
   create(@Body() createServicoDto: CreateServicoDto) {
