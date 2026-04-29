@@ -7,6 +7,8 @@ export const useSessiones = (filtros?: any) => {
   const [error, setError] = useState<string | null>(null);
   const filtrosRef = useRef<any>(filtros);
   const bloqueadoPorPermissaoRef = useRef(false);
+  const requisicaoAtivaRef = useRef(false);
+  const ultimaChaveCarregadaRef = useRef<string | null>(null);
 
   useEffect(() => {
     filtrosRef.current = filtros;
@@ -24,24 +26,45 @@ export const useSessiones = (filtros?: any) => {
     });
   }, [filtros]);
 
-  const carregarSessoes = useCallback(async () => {
+  const carregarSessoes = useCallback(async (force = false) => {
     if (bloqueadoPorPermissaoRef.current) {
       return;
     }
 
+    const filtrosAtuais = filtrosRef.current ?? {};
+    const chaveAtual = JSON.stringify({
+      id_encarregado: filtrosAtuais.id_encarregado ?? null,
+      id_obra: filtrosAtuais.id_obra ?? null,
+      data_inicio: filtrosAtuais.data_inicio ?? null,
+      data_fim: filtrosAtuais.data_fim ?? null,
+      status: filtrosAtuais.status ?? null,
+    });
+
+    if (!force && ultimaChaveCarregadaRef.current === chaveAtual) {
+      return;
+    }
+
+    if (requisicaoAtivaRef.current) {
+      return;
+    }
+
     try {
+      requisicaoAtivaRef.current = true;
       setLoading(true);
       setError(null);
-      const dados = await sessoesService.listar(filtrosRef.current);
+      const dados = await sessoesService.listar(filtrosAtuais);
       setSessoes(dados);
+      ultimaChaveCarregadaRef.current = chaveAtual;
     } catch (err: any) {
       const status = err?.status ?? err?.response?.status;
       if (status === 403) {
         // Evita repetir chamadas quando o backend já negou acesso para este contexto.
         bloqueadoPorPermissaoRef.current = true;
+        ultimaChaveCarregadaRef.current = chaveAtual;
       }
       setError(err?.response?.data?.message || err?.message || 'Erro ao carregar sessões');
     } finally {
+      requisicaoAtivaRef.current = false;
       setLoading(false);
     }
   }, []);
@@ -109,6 +132,7 @@ export const useSessiones = (filtros?: any) => {
   useEffect(() => {
     // Ao mudar filtros, libera uma nova tentativa de carregamento.
     bloqueadoPorPermissaoRef.current = false;
+    ultimaChaveCarregadaRef.current = null;
     void carregarSessoes();
   }, [carregarSessoes, filtrosKey]);
 

@@ -184,7 +184,7 @@ export const SessoesPage = () => {
         message: 'Sessão criada com sucesso!',
         severity: 'success',
       });
-      await carregarSessoes();
+      await carregarSessoes(true);
     } catch (err: any) {
       // Se for erro de alocação em andamento, usar Toast com shake
       if (err.response?.data?.message?.includes('EM_ANDAMENTO') || err.response?.data?.message?.includes('em uso')) {
@@ -213,7 +213,7 @@ export const SessoesPage = () => {
         nome_assinante: dados?.nome_assinante,
         cpf_assinante: dados?.cpf_assinante,
       });
-      await carregarSessoes();
+      await carregarSessoes(true);
     } catch (err: any) {
       alert('Erro ao encerrar sessão: ' + err.message);
     }
@@ -222,7 +222,7 @@ export const SessoesPage = () => {
   const handleDeletarSessao = async (id: string) => {
     try {
       await deletarSessao(id);
-      await carregarSessoes();
+      await carregarSessoes(true);
     } catch (err: any) {
       alert('Erro ao deletar sessão: ' + err.message);
     }
@@ -274,8 +274,11 @@ export const SessoesPage = () => {
       <Paper sx={{ p: 2, mb: 3 }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <FormControl sx={{ minWidth: 150 }}>
-            <InputLabel>Status</InputLabel>
+            <InputLabel id="filtro-status-label">Status</InputLabel>
             <Select
+              labelId="filtro-status-label"
+              id="filtro-status"
+              name="filtro_status"
               value={filtroStatus}
               label="Status"
               onChange={(e) => setFiltroStatus(e.target.value as any)}
@@ -287,8 +290,11 @@ export const SessoesPage = () => {
           </FormControl>
 
           <FormControl sx={{ minWidth: 250 }}>
-            <InputLabel>Obra</InputLabel>
+            <InputLabel id="filtro-obra-label">Obra</InputLabel>
             <Select
+              labelId="filtro-obra-label"
+              id="filtro-obra"
+              name="filtro_obra"
               value={filtroObra}
               label="Obra"
               onChange={(e) => setFiltroObra(e.target.value)}
@@ -425,6 +431,8 @@ export const SessoesPage = () => {
           )}
 
           <TextField
+            id="data-sessao"
+            name="data_sessao"
             fullWidth
             type="date"
             label="Data da Sessão"
@@ -454,6 +462,8 @@ export const SessoesPage = () => {
             )}
 
             <TextField
+              id="geo-lat"
+              name="geo_lat"
               fullWidth
               label="Latitude"
               type="number"
@@ -464,6 +474,8 @@ export const SessoesPage = () => {
             />
 
             <TextField
+              id="geo-long"
+              name="geo_long"
               fullWidth
               label="Longitude"
               type="number"
@@ -475,6 +487,8 @@ export const SessoesPage = () => {
           </Box>
 
           <TextField
+            id="observacoes"
+            name="observacoes"
             fullWidth
             label="Observações (opcional)"
             placeholder="Notas sobre a sessão"
@@ -494,6 +508,8 @@ export const SessoesPage = () => {
           />
 
           <TextField
+            id="nome-assinante"
+            name="nome_assinante"
             fullWidth
             required
             label="Nome de Quem Assinou"
@@ -504,6 +520,8 @@ export const SessoesPage = () => {
           />
 
           <TextField
+            id="cpf-assinante"
+            name="cpf_assinante"
             fullWidth
             label="CPF de Quem Assinou (opcional)"
             placeholder="000.000.000-00"
