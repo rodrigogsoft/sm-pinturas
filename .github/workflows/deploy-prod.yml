@@ -3,7 +3,7 @@ name: Build & Deploy - Production
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'backend/**'
       - 'frontend/**'
@@ -143,7 +143,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [build, test]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
 
     steps:
       - name: Checkout
@@ -157,23 +157,20 @@ jobs:
           key: ${{ secrets.PROD_SERVER_SSH_KEY }}
           script: |
             cd /app/jb_pinturas
-            git pull origin main
-            
-            # Load environment variables
-            source /app/.env.prod
-            
-            # Pull latest images
-            docker-compose -f docker-compose.prod.yml pull
-            
-            # Run migrations
-            docker-compose -f docker-compose.prod.yml run --rm backend npm run migration:run
-            
-            # Start services
-            docker-compose -f docker-compose.prod.yml up -d
-            
-            # Verify deployment
+            git pull origin master
+
+            # Pull latest images for production profile
+            docker compose -f docker-compose.prod.yml --profile producao pull backend-prod frontend-prod
+
+            # Run migrations in backend production container
+            docker compose -f docker-compose.prod.yml --profile producao run --rm backend-prod npm run migration:run
+
+            # Start production services
+            docker compose -f docker-compose.prod.yml --profile producao up -d backend-prod frontend-prod
+
+            # Verify backend health endpoint
             sleep 10
-            curl -f http://localhost:3000/health || exit 1
+            curl -f http://localhost:3006/api/v1/health || exit 1
 
       - name: Notify Slack on Success
         if: success()

@@ -2,12 +2,12 @@ name: Frontend CI/CD
 
 on:
   push:
-    branches: [main, develop]
+    branches: [master, homol]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend.yml'
   pull_request:
-    branches: [main, develop]
+    branches: [master, homol]
     paths:
       - 'frontend/**'
 
@@ -82,7 +82,7 @@ jobs:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
 
     steps:
       - name: Deploy to production server
@@ -93,5 +93,5 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             cd /opt/jb-pinturas
-            docker-compose pull frontend
-            docker-compose up -d frontend
+            docker compose -f docker-compose.prod.yml --profile producao pull frontend-prod
+            docker compose -f docker-compose.prod.yml --profile producao up -d frontend-prod
