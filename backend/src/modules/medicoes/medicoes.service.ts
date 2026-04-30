@@ -60,13 +60,23 @@ export class MedicoesService {
       throw new NotFoundException('Alocacao nao encontrada');
     }
 
-    if (alocacao.item_ambiente?.tabelaPreco &&
-        alocacao.item_ambiente.tabelaPreco.id_servico_catalogo === alocacao.id_servico_catalogo) {
-      return alocacao.item_ambiente.tabelaPreco;
+    const tabelaPrecoItem = alocacao.item_ambiente?.tabelaPreco;
+    const idServicoAlocacao = alocacao.id_servico_catalogo;
+
+    // Fluxo principal: usar tabela vinculada ao item do ambiente.
+    // Em alocações legadas, id_servico_catalogo pode estar nulo, então
+    // aceitamos a tabela do item como fonte de verdade quando ela existir.
+    if (tabelaPrecoItem && !tabelaPrecoItem.deletado) {
+      if (
+        idServicoAlocacao == null ||
+        tabelaPrecoItem.id_servico_catalogo === idServicoAlocacao
+      ) {
+        return tabelaPrecoItem;
+      }
     }
 
     const idObra = alocacao.ambiente?.pavimento?.id_obra;
-    const idServicoCatalogo = alocacao.id_servico_catalogo;
+    const idServicoCatalogo = idServicoAlocacao ?? tabelaPrecoItem?.id_servico_catalogo;
 
     if (!idObra || !idServicoCatalogo) {
       throw new BadRequestException(
@@ -84,7 +94,9 @@ export class MedicoesService {
     });
 
     if (!tabelaPrecoAmbiente) {
-      throw new NotFoundException('Tabela de preco nao encontrada para obra/servico da alocacao');
+      throw new BadRequestException(
+        'Tabela de preco nao encontrada para obra/servico da alocacao. Verifique o vinculo do item de ambiente com a tabela de preco.',
+      );
     }
 
     return tabelaPrecoAmbiente;
