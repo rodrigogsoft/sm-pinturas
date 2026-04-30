@@ -1321,14 +1321,23 @@ export class FinanceiroService {
   ): Promise<boolean> {
     const query = this.medicaoColaboradorRepository
       .createQueryBuilder('mc')
+      .leftJoin('mc.lote_pagamento', 'lote')
+      .leftJoin('mc.item_ambiente', 'item')
+      .leftJoin('item.tabelaPreco', 'tabela_preco')
+      .leftJoin('tabela_preco.servico', 'servico_catalogo')
+      .leftJoin('mc.colaborador', 'colaborador')
       .where('mc.deletado = false');
 
     if (queryDto.data_inicio) {
-      query.andWhere('mc.data_medicao >= :data_inicio', { data_inicio: queryDto.data_inicio });
+      query.andWhere('COALESCE(mc.data_medicao, mc.created_at) >= :data_inicio', {
+        data_inicio: queryDto.data_inicio,
+      });
     }
 
     if (queryDto.data_fim) {
-      query.andWhere('mc.data_medicao <= :data_fim', { data_fim: queryDto.data_fim });
+      query.andWhere('COALESCE(mc.data_medicao, mc.created_at) <= :data_fim', {
+        data_fim: queryDto.data_fim,
+      });
     }
 
     if (queryDto.id_colaborador) {
@@ -1339,11 +1348,34 @@ export class FinanceiroService {
 
     if (queryDto.id_obra) {
       query
-        .leftJoin('mc.item_ambiente', 'item')
         .leftJoin('item.ambiente', 'ambiente')
         .leftJoin('ambiente.pavimento', 'pavimento')
         .leftJoin('pavimento.obra', 'obra')
         .andWhere('obra.id = :id_obra', { id_obra: queryDto.id_obra });
+    }
+
+    if (queryDto.colaborador) {
+      query.andWhere('colaborador.nome_completo ILIKE :colaborador', {
+        colaborador: `%${queryDto.colaborador}%`,
+      });
+    }
+
+    if (queryDto.servico) {
+      query.andWhere('servico_catalogo.nome ILIKE :servico', {
+        servico: `%${queryDto.servico}%`,
+      });
+    }
+
+    if (queryDto.status === 'ABERTO' || queryDto.status === 'PAGO') {
+      query.andWhere('mc.status_pagamento = :status_pagamento', {
+        status_pagamento: queryDto.status,
+      });
+    }
+
+    if (queryDto.status === 'CANCELADO') {
+      query.andWhere('lote.status = :status_lote', {
+        status_lote: StatusLoteEnum.CANCELADO,
+      });
     }
 
     const total = await query.getCount();
@@ -1384,11 +1416,15 @@ export class FinanceiroService {
       .where('mc.deletado = false');
 
     if (queryDto.data_inicio) {
-      query.andWhere('mc.data_medicao >= :data_inicio', { data_inicio: queryDto.data_inicio });
+      query.andWhere('COALESCE(mc.data_medicao, mc.created_at) >= :data_inicio', {
+        data_inicio: queryDto.data_inicio,
+      });
     }
 
     if (queryDto.data_fim) {
-      query.andWhere('mc.data_medicao <= :data_fim', { data_fim: queryDto.data_fim });
+      query.andWhere('COALESCE(mc.data_medicao, mc.created_at) <= :data_fim', {
+        data_fim: queryDto.data_fim,
+      });
     }
 
     if (queryDto.id_colaborador) {
@@ -1584,11 +1620,15 @@ export class FinanceiroService {
       .where('m.deletado = false');
 
     if (queryDto.data_inicio) {
-      query.andWhere('m.data_medicao >= :data_inicio', { data_inicio: queryDto.data_inicio });
+      query.andWhere('COALESCE(m.data_medicao, m.created_at) >= :data_inicio', {
+        data_inicio: queryDto.data_inicio,
+      });
     }
 
     if (queryDto.data_fim) {
-      query.andWhere('m.data_medicao <= :data_fim', { data_fim: queryDto.data_fim });
+      query.andWhere('COALESCE(m.data_medicao, m.created_at) <= :data_fim', {
+        data_fim: queryDto.data_fim,
+      });
     }
 
     if (queryDto.id_colaborador) {
