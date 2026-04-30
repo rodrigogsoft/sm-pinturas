@@ -9,6 +9,7 @@
 5. [Database](#database)
 6. [Testes](#testes)
 7. [Deploy](#deploy)
+8. [Versionamento](#versionamento)
 
 ---
 
@@ -518,6 +519,40 @@ docker logs jb_pinturas_backend | grep BullMQ
 
 # Testar conexão Redis
 redis-cli -h localhost -p 6379 ping
+```
+
+---
+
+## Versionamento
+
+### Rotina padrão após commit
+
+Sempre que finalizar um commit e for publicar no remoto, use um dos comandos abaixo na raiz do repositório.
+
+```bash
+# Release de correção (patch): v1.0.1 -> v1.0.2
+npm run release:patch
+
+# Release de funcionalidade (minor): v1.0.1 -> v1.1.0
+npm run release:minor
+
+# Release de mudança grande/compatibilidade (major): v1.0.1 -> v2.0.0
+npm run release:major
+```
+
+### O que o script faz
+
+- Valida se o working tree está limpo (sem alterações pendentes)
+- Faz push da branch atual para origin
+- Cria tag anotada no formato semântico vMAJOR.MINOR.PATCH
+- Faz push da nova tag para origin
+
+### Fluxo recomendado
+
+```bash
+git add .
+git commit -m "fix(modulo): descricao"
+npm run release:patch
 ```
 
 ---

@@ -25,7 +25,10 @@
     "migration:run:typeorm": "typeorm migration:run -d src/config/datasource.ts",
     "migration:revert": "typeorm migration:revert -d src/config/datasource.ts",
     "seed": "ts-node src/database/seeds/run-seed.ts",
-    "seed:demo": "node scripts/seed-demo-data.js"
+    "seed:demo": "node scripts/seed-demo-data.js",
+    "release:patch": "node ../scripts/release-version.cjs patch",
+    "release:minor": "node ../scripts/release-version.cjs minor",
+    "release:major": "node ../scripts/release-version.cjs major"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.988.0",

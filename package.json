@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "release:patch": "node scripts/release-version.cjs patch",
+    "release:minor": "node scripts/release-version.cjs minor",
+    "release:major": "node scripts/release-version.cjs major"
+  },
   "dependencies": {
     "firebase": "^12.10.0",
     "jspdf": "^4.2.0",
