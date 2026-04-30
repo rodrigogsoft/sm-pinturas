@@ -397,8 +397,6 @@ export class RelatoriosService {
         ) || 0;
         const precoUnitario = precoDireto > 0 ? precoDireto : precoFallback;
         const quantidade = Number(m.qtd_executada || 0);
-        const valorCalculadoMedicao = Number(m.valor_calculado || 0);
-        const valorTotalRelatorio = quantidade * precoUnitario;
         const nomeEncarregadoSessao = (m.alocacao as any)?.sessao?.nome_assinante;
         const nomeUsuarioEncarregado = (m.alocacao as any)?.sessao?.encarregado?.nome_completo;
         const nomeExecutorAlocacao = m.alocacao?.colaborador?.nome_completo;
@@ -417,7 +415,7 @@ export class RelatoriosService {
           encarregado,
           servico: nomeServico,
           quantidade: m.qtd_executada,
-          valor_total: Number((valorTotalRelatorio > 0 ? valorTotalRelatorio : valorCalculadoMedicao).toFixed(2)),
+          valor_total: Number((quantidade * precoUnitario).toFixed(2)),
           status: m.status_pagamento,
           excedente: m.flag_excedente,
         };
