@@ -71,6 +71,14 @@ const DASHBOARD_REQUEST_TIMEOUT_MS = 15000;
 
 const toNumber = (value: number | string | null | undefined) => Number(value ?? 0);
 
+const formatarDecimal2 = (value: number | string | null | undefined) =>
+  new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(toNumber(value));
+
+const formatarPercentual2 = (value: number | string | null | undefined) => `${formatarDecimal2(value)}%`;
+
 const getClienteNome = (obra: Obra) => obra.cliente?.razao_social || 'Cliente não informado';
 
 const getCorStatus = (status: StatusObraEnum) => (status === StatusObraEnum.ATIVA ? 'success' : 'default');
@@ -218,7 +226,7 @@ function ObraCard({
             <Typography variant="caption" display="block">{clienteNome}</Typography>
             <Typography variant="caption" display="block">{obra.endereco_completo}</Typography>
             <Typography variant="caption" display="block" sx={{ mt: 0.75 }}>
-              Progresso geral: {progresso.toFixed(1)}%
+              Progresso geral: {formatarPercentual2(progresso)}
             </Typography>
           </Box>
         }
@@ -371,7 +379,7 @@ function ObraCard({
                   Progresso geral
                 </Typography>
                 <Typography variant="caption" fontWeight={800} color="text.primary">
-                  {progresso.toFixed(1)}%
+                  {formatarPercentual2(progresso)}
                 </Typography>
               </Stack>
               <LinearProgress
@@ -442,9 +450,9 @@ function ObraCard({
                   <QueryStatsOutlinedIcon color="primary" />
                   <Box>
                     <Typography variant="caption" color="text.secondary">Área medida</Typography>
-                    <Typography variant="h6" fontWeight={800}>{areaMedidaExibida.toFixed(1)} m²</Typography>
+                    <Typography variant="h6" fontWeight={800}>{formatarDecimal2(areaMedidaExibida)} m²</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      de {areaPlanejadaExibida.toFixed(1)} m² planejados
+                      de {formatarDecimal2(areaPlanejadaExibida)} m² planejados
                     </Typography>
                   </Box>
                 </Stack>
@@ -507,7 +515,7 @@ function ObraCard({
                         </Typography>
                       </Box>
                       <Typography variant="subtitle2" fontWeight={800} color="primary.main">
-                        {resumo.progresso.toFixed(0)}%
+                        {formatarPercentual2(resumo.progresso)}
                       </Typography>
                     </Stack>
 
@@ -521,11 +529,11 @@ function ObraCard({
                     <Grid container spacing={1} sx={{ mb: 1 }}>
                       <Grid item xs={6}>
                         <Typography variant="caption" color="text.secondary">Área planejada</Typography>
-                        <Typography variant="body2" fontWeight={700}>{resumo.areaPlanejada.toFixed(1)} m²</Typography>
+                        <Typography variant="body2" fontWeight={700}>{formatarDecimal2(resumo.areaPlanejada)} m²</Typography>
                       </Grid>
                       <Grid item xs={6}>
                         <Typography variant="caption" color="text.secondary">Área medida</Typography>
-                        <Typography variant="body2" fontWeight={700}>{resumo.areaMedida.toFixed(1)} m²</Typography>
+                        <Typography variant="body2" fontWeight={700}>{formatarDecimal2(resumo.areaMedida)} m²</Typography>
                       </Grid>
                     </Grid>
 
