@@ -64,15 +64,10 @@ export class MedicoesService {
     const idServicoAlocacao = alocacao.id_servico_catalogo;
 
     // Fluxo principal: usar tabela vinculada ao item do ambiente.
-    // Em alocações legadas, id_servico_catalogo pode estar nulo, então
-    // aceitamos a tabela do item como fonte de verdade quando ela existir.
+    // Isso cobre cenários legados com id_servico_catalogo nulo ou divergente
+    // na alocação, mas item já vinculado corretamente à tabela de preço.
     if (tabelaPrecoItem && !tabelaPrecoItem.deletado) {
-      if (
-        idServicoAlocacao == null ||
-        tabelaPrecoItem.id_servico_catalogo === idServicoAlocacao
-      ) {
-        return tabelaPrecoItem;
-      }
+      return tabelaPrecoItem;
     }
 
     const idObra = alocacao.ambiente?.pavimento?.id_obra;

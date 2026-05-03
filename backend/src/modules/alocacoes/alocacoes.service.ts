@@ -222,12 +222,19 @@ export class AlocacoesService {
     try {
       await this.sincronizarPrecoCusto(createAlocacaoDto);
     } catch (error) {
-      // A sincronização de preço é um efeito colateral.
-      // Não deve impedir a criação da alocação em caso de drift de schema/constraints.
+      const mensagemErro = error instanceof Error ? error.message : String(error);
+
+      // Quando o usuário informou preço de custo, a sincronização deixa de ser
+      // efeito colateral e passa a ser parte obrigatória da operação.
+      if (createAlocacaoDto.preco_custo !== undefined) {
+        throw new BadRequestException(
+          `Nao foi possivel salvar o preco de custo da alocacao: ${mensagemErro}`,
+        );
+      }
+
+      // Sem preço informado, mantém comportamento fail-safe para não bloquear alocação.
       this.logger.warn(
-        `Falha ao sincronizar preço de custo para alocação (sessao=${createAlocacaoDto.id_sessao}, servico=${createAlocacaoDto.id_servico_catalogo}): ${
-          error instanceof Error ? error.message : String(error)
-        }`,
+        `Falha ao sincronizar preço de custo para alocação (sessao=${createAlocacaoDto.id_sessao}, servico=${createAlocacaoDto.id_servico_catalogo}): ${mensagemErro}`,
       );
     }
 
@@ -378,8 +385,46 @@ export class AlocacoesService {
       throw new BadRequestException('Não é possível modificar uma alocação já concluída');
     }
 
+    if (
+      updateAlocacaoDto.preco_custo !== undefined &&
+      Number(updateAlocacaoDto.preco_custo) <= 0
+    ) {
+      throw new BadRequestException('Preço de custo deve ser maior que zero');
+    }
+
+    const precoCustoParaSincronizar = updateAlocacaoDto.preco_custo;
+    const idServicoParaSincronizar =
+      updateAlocacaoDto.id_servico_catalogo ?? alocacao.id_servico_catalogo;
+
+    if (
+      precoCustoParaSincronizar !== undefined &&
+      (idServicoParaSincronizar === undefined || idServicoParaSincronizar === null)
+    ) {
+      throw new BadRequestException(
+        'Nao foi possivel salvar o preco de custo: servico da alocacao nao informado',
+      );
+    }
+
     Object.assign(alocacao, updateAlocacaoDto);
-    return await this.alocacaoRepository.save(alocacao);
+    const alocacaoAtualizada = await this.alocacaoRepository.save(alocacao);
+
+    if (
+      precoCustoParaSincronizar !== undefined &&
+      idServicoParaSincronizar !== undefined &&
+      idServicoParaSincronizar !== null
+    ) {
+      await this.sincronizarPrecoCusto({
+        id_sessao: alocacaoAtualizada.id_sessao,
+        id_ambiente: alocacaoAtualizada.id_ambiente,
+        id_colaborador: alocacaoAtualizada.id_colaborador,
+        hora_inicio: alocacaoAtualizada.hora_inicio.toISOString(),
+        id_item_ambiente: alocacaoAtualizada.id_item_ambiente ?? undefined,
+        id_servico_catalogo: Number(idServicoParaSincronizar),
+        preco_custo: Number(precoCustoParaSincronizar),
+      });
+    }
+
+    return alocacaoAtualizada;
   }
 
   /**
