@@ -158,6 +158,11 @@ interface ItemAmbienteLookup {
   nome_elemento?: string | null;
 }
 
+interface PrecoTabelaApi {
+  id_servico_catalogo?: number;
+  preco_custo?: number;
+}
+
 const toNumber = (value: unknown): number => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -184,6 +189,7 @@ export const AlocacaoPage: React.FC = () => {
   const [pavimentos, setPavimentos] = useState<Pavimento[]>([]);
   const [ambientes, setAmbientes] = useState<Ambiente[]>([]);
   const [servicos, setServicos] = useState<ServicoCatalogo[]>([]);
+  const [precosPorServico, setPrecosPorServico] = useState<Map<number, number>>(new Map());
   const [alocacoes, setAlocacoes] = useState<AlocacaoAtiva[]>([]);
   const [sessao, setSessao] = useState<any>(null);
   const [nomeObra, setNomeObra] = useState('');
@@ -357,6 +363,32 @@ export const AlocacaoPage: React.FC = () => {
         ),
       );
 
+      if (obraId && obraId !== 'null') {
+        try {
+          const precosRes = await api.get('/precos', {
+            params: { idObra: obraId },
+          });
+          const precosRaw = (precosRes.data.data || precosRes.data || []) as PrecoTabelaApi[];
+          const precosMap = new Map<number, number>();
+
+          precosRaw.forEach((preco) => {
+            const idServico = Number(preco.id_servico_catalogo);
+            const precoCusto = Number(preco.preco_custo);
+
+            if (Number.isFinite(idServico) && Number.isFinite(precoCusto)) {
+              precosMap.set(idServico, precoCusto);
+            }
+          });
+
+          setPrecosPorServico(precosMap);
+        } catch (error) {
+          console.warn('Nao foi possivel carregar tabela de precos da obra:', error);
+          setPrecosPorServico(new Map());
+        }
+      } else {
+        setPrecosPorServico(new Map());
+      }
+
       // Carregar alocações ativas
       const [alocRes, medicoesRes] = await Promise.all([
         api.get('/alocacoes', {
@@ -472,8 +504,17 @@ export const AlocacaoPage: React.FC = () => {
   const handleAbrirEdicao = (aloc: AlocacaoAtiva) => {
     setAlocacaoEditando(aloc);
     setEditColaborador(aloc.id_colaborador);
-    setEditServico(aloc.id_servico !== null ? String(aloc.id_servico) : '');
-    setEditPrecoCusto('');
+
+    const idServicoAtual = aloc.id_servico !== null ? Number(aloc.id_servico) : undefined;
+    const precoAtualServico =
+      idServicoAtual !== undefined
+        ? precosPorServico.get(idServicoAtual)
+        : undefined;
+
+    setEditServico(idServicoAtual !== undefined ? String(idServicoAtual) : '');
+    setEditPrecoCusto(
+      precoAtualServico !== undefined ? String(precoAtualServico.toFixed(2)) : '',
+    );
     setEditObservacoes('');
     setEditError('');
     setOpenEditDialog(true);
@@ -497,7 +538,7 @@ export const AlocacaoPage: React.FC = () => {
         id_colaborador: editColaborador,
       };
       if (editServico) payload.id_servico_catalogo = Number(editServico);
-      if (precoCustoNorm) payload.preco_custo = precoCustoNorm;
+      if (precoCustoNorm !== undefined) payload.preco_custo = precoCustoNorm;
       if (editObservacoes.trim()) payload.observacoes = editObservacoes.trim();
       await api.patch(`/alocacoes/${alocacaoEditando.id}`, payload);
       setOpenEditDialog(false);
@@ -791,7 +832,15 @@ export const AlocacaoPage: React.FC = () => {
             <Select
               value={editServico}
               label="Serviço"
-              onChange={(e) => setEditServico(e.target.value)}
+              onChange={(e) => {
+                const proximoServico = String(e.target.value);
+                setEditServico(proximoServico);
+
+                const precoTabela = precosPorServico.get(Number(proximoServico));
+                setEditPrecoCusto(
+                  precoTabela !== undefined ? String(precoTabela.toFixed(2)) : '',
+                );
+              }}
             >
               <MenuItem value="">Manter atual</MenuItem>
               {servicos.map((serv) => (
@@ -934,7 +983,15 @@ export const AlocacaoPage: React.FC = () => {
             <Select
               value={selectedServico}
               label="Serviço *"
-              onChange={(e) => setSelectedServico(e.target.value)}
+              onChange={(e) => {
+                const proximoServico = String(e.target.value);
+                setSelectedServico(proximoServico);
+
+                const precoTabela = precosPorServico.get(Number(proximoServico));
+                setPrecoCusto(
+                  precoTabela !== undefined ? String(precoTabela.toFixed(2)) : '',
+                );
+              }}
             >
               {servicos.map((serv) => (
                 <MenuItem key={serv.id} value={serv.id}>
